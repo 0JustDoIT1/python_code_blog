@@ -1,0 +1,189 @@
+export interface LibSection {
+  id: string;
+  label: string;
+}
+
+export interface Library {
+  slug: string;
+  title: string;
+  description: string;
+  icon: string;
+  color: string;
+  sections: LibSection[];
+}
+
+export const LIBRARIES: Library[] = [
+  {
+    slug: 'numpy',
+    title: 'NumPy',
+    description: '배열 생성 · 수학/선형대수 · 난수',
+    icon: '⬡',
+    color: '#4878D0',
+    sections: [
+      { id: 'import_sec', label: 'import & 기초' },
+      { id: 'create',     label: '배열 생성' },
+      { id: 'shape',      label: 'shape & 변환' },
+      { id: 'index',      label: '인덱싱' },
+      { id: 'math',       label: '수학 연산' },
+      { id: 'stat',       label: '통계 & 정렬' },
+      { id: 'linalg',     label: '선형대수' },
+      { id: 'random',     label: '난수' },
+      { id: 'utils',      label: '유틸 & 기타' },
+    ],
+  },
+  {
+    slug: 'pandas',
+    title: 'Pandas',
+    description: 'DataFrame · 필터링 · groupby · 병합 · I/O',
+    icon: '⊞',
+    color: '#5B8DB8',
+    sections: [
+      { id: 'import_sec', label: 'import & 기초' },
+      { id: 'struct',     label: '자료구조' },
+      { id: 'select',     label: '선택 & 인덱싱' },
+      { id: 'filter',     label: '필터링 & 정렬' },
+      { id: 'clean',      label: '결측값 & 정제' },
+      { id: 'transform',  label: '변환 & 연산' },
+      { id: 'groupby',    label: 'groupby & 집계' },
+      { id: 'merge',      label: '병합 & 연결' },
+      { id: 'io',         label: '파일 입출력' },
+      { id: 'stat',       label: '통계 & 시각화' },
+      { id: 'adv_prep',   label: '전처리 심화' },
+    ],
+  },
+  {
+    slug: 'matplotlib',
+    title: 'Matplotlib',
+    description: '기본 플롯 · 통계 · 레이아웃 · 3D',
+    icon: '◈',
+    color: '#5C9E6E',
+    sections: [
+      { id: 'import_sec', label: 'import & 기초' },
+      { id: 'figure',     label: 'Figure & Axes' },
+      { id: 'plot2d',     label: '기본 플롯' },
+      { id: 'stat_plot',  label: '통계 플롯' },
+      { id: 'styling',    label: '스타일링' },
+      { id: 'layout',     label: '레이아웃' },
+      { id: 'text',       label: '텍스트 & 주석' },
+      { id: 'save',       label: '저장 & 출력' },
+      { id: 'plot3d',     label: '3D 시각화' },
+    ],
+  },
+  {
+    slug: 'scipy',
+    title: 'SciPy',
+    description: '확률분포 · 가설검정 · 최적화 · FFT',
+    icon: '∫',
+    color: '#8B6BB1',
+    sections: [
+      { id: 'import_sec',  label: 'import & 개요' },
+      { id: 'dist',        label: '확률분포' },
+      { id: 'hypo',        label: '가설검정' },
+      { id: 'corr',        label: '상관 & 비모수' },
+      { id: 'optim',       label: '최적화 & 커브피팅' },
+      { id: 'spatial',     label: '거리 & 공간' },
+      { id: 'integrate',   label: '적분 & 미분방정식' },
+      { id: 'interpolate', label: '보간법' },
+      { id: 'ndimage',     label: '이미지 처리' },
+      { id: 'fft_sec',     label: '푸리에 변환' },
+      { id: 'stats_adv',   label: '변환 & 심화' },
+    ],
+  },
+  {
+    slug: 'sklearn',
+    title: 'Scikit-learn',
+    description: '전처리 · 선형/트리 모델 · 평가 · Pipeline',
+    icon: '⚙',
+    color: '#E07040',
+    sections: [
+      { id: 'import_sec', label: 'import & API 구조' },
+      { id: 'preprocess', label: '전처리' },
+      { id: 'linear',     label: '선형 모델' },
+      { id: 'tree',       label: '트리 & 앙상블' },
+      { id: 'svm_knn',    label: 'SVM & KNN' },
+      { id: 'cluster',    label: '클러스터링' },
+      { id: 'dim_red',    label: '차원 축소' },
+      { id: 'eval',       label: '검증 & 평가지표' },
+      { id: 'pipeline',   label: 'Pipeline & 튜닝' },
+    ],
+  },
+  {
+    slug: 'statsmodels',
+    title: 'Statsmodels',
+    description: 'OLS · GLM · ARIMA · 가설검정',
+    icon: '~',
+    color: '#C0602A',
+    sections: [
+      { id: 'import_sec', label: 'import & 개요' },
+      { id: 'ols',        label: 'OLS 선형회귀' },
+      { id: 'glm',        label: 'GLM & 로지스틱' },
+      { id: 'ts_basic',   label: '시계열 기초' },
+      { id: 'arima',      label: 'ARIMA & SARIMA' },
+      { id: 'test',       label: '가설검정' },
+      { id: 'smoothing',  label: '지수평활법' },
+    ],
+  },
+  {
+    slug: 'xgboost',
+    title: 'XGBoost',
+    description: 'sklearn API · Native API · 파라미터 · 튜닝',
+    icon: '⊕',
+    color: '#B8860B',
+    sections: [
+      { id: 'import_sec',  label: 'import & 개요' },
+      { id: 'sklearn_api', label: 'sklearn API' },
+      { id: 'native_api',  label: 'Native API' },
+      { id: 'params',      label: '핵심 파라미터' },
+      { id: 'interpret',   label: '특성 중요도' },
+      { id: 'tuning',      label: '튜닝 전략' },
+    ],
+  },
+  {
+    slug: 'crawling',
+    title: 'Crawling & DB',
+    description: 'requests · BeautifulSoup · pymysql · DuckDB · 금융',
+    icon: '⊗',
+    color: '#4A8FA8',
+    sections: [
+      { id: 'import_sec',   label: 'Import 패턴' },
+      { id: 'requests_sec', label: 'requests & BS4' },
+      { id: 'pymysql_sec',  label: 'pymysql / SQLAlchemy' },
+      { id: 'duckdb_sec',   label: 'DuckDB' },
+      { id: 'finance_sec',  label: 'FinanceDataReader' },
+    ],
+  },
+  {
+    slug: 'naive_bayes',
+    title: 'Naive Bayes',
+    description: 'Bayes 원리 · CategoricalNB · BernoulliNB · MultinomialNB · 튜닝',
+    icon: 'ℙ',
+    color: '#2E86AB',
+    sections: [
+      { id: 'nb_intro',       label: 'Bayes 원리 & 개요' },
+      { id: 'categorical_nb', label: 'CategoricalNB' },
+      { id: 'bernoulli_nb',   label: 'BernoulliNB' },
+      { id: 'multinomial_nb', label: 'MultinomialNB' },
+      { id: 'nb_tuning',      label: '튜닝 & 서비스 함수' },
+      { id: 'nb_eval',        label: '평가 & 시각화' },
+    ],
+  },
+  {
+    slug: 'ml_classification',
+    title: 'ML Classification',
+    description: '확률기초 · MLE · 로지스틱 · 임계값 · 평가 · PCA',
+    icon: 'σ',
+    color: '#9B59B6',
+    sections: [
+      { id: 'prob',       label: '확률 기초' },
+      { id: 'likelihood', label: '우도 & MLE' },
+      { id: 'logistic',   label: '로지스틱 회귀' },
+      { id: 'threshold',  label: '임계값 분석' },
+      { id: 'evaluation', label: '모델 평가' },
+      { id: 'pca',        label: 'PCA 차원축소' },
+    ],
+  },
+];
+
+export function getLibrary(slug: string): Library | undefined {
+  return LIBRARIES.find((l) => l.slug === slug);
+}

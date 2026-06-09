@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DS Reference
 
-## Getting Started
+Python 데이터 사이언스 핵심 레퍼런스 모음 — Next.js + Vercel
 
-First, run the development server:
+## 라이브러리 목록
+
+| 슬러그 | 라이브러리 | 섹션 |
+|--------|-----------|------|
+| numpy | NumPy | 9 |
+| pandas | Pandas | 11 |
+| matplotlib | Matplotlib | 9 |
+| scipy | SciPy | 11 |
+| sklearn | Scikit-learn | 9 |
+| statsmodels | Statsmodels | 7 |
+| xgboost | XGBoost | 6 |
+| crawling | Crawling & DB | 5 |
+| ml_classification | ML Classification | 6 |
+
+## 개발
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Vercel 배포
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Vercel CLI
+npm i -g vercel
+vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# 또는 GitHub 연결 후 자동 배포
+```
 
-## Learn More
+## 구조
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+app/
+  page.tsx              ← 메인 (카드 그리드)
+  layout.tsx
+  globals.css
+  lib/
+    libraries.ts        ← 라이브러리 메타데이터
+  reference/[slug]/
+    page.tsx            ← SSG 서버 컴포넌트
+    RefClient.tsx       ← 클라이언트 (사이드바 + 아코디언)
+public/
+  data/
+    numpy.json          ← 섹션별 HTML 데이터
+    pandas.json
+    ...
+```
