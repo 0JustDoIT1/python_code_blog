@@ -1,0 +1,560 @@
+{
+  "nearest_neighbors": [
+    {
+      "fnName": "NearestNeighbors()",
+      "badgeCls": "b-blue",
+      "badgeText": "핵심 API",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "주어진 데이터셋에서 임의의 쿼리 포인트와 가장 가까운 k개의 이웃을 찾는 비지도 모델. 분류·회귀·그래프 생성 등 KNN 계열 알고리즘의 기반이 되며, <code>fit()</code> 후 <code>kneighbors()</code>로 거리와 인덱스를 반환한다."
+        },
+        {
+          "type": "slbl",
+          "text": "주요 파라미터"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>n_neighbors</td><td>int=5</td><td>탐색할 이웃 수 k</td></tr><tr><td>algorithm</td><td>str='auto'</td><td>탐색 알고리즘: <code>ball_tree</code> · <code>kd_tree</code> · <code>brute</code> · <code>auto</code></td></tr><tr><td>metric</td><td>str='minkowski'</td><td>거리 측정 방식 (기본값은 p=2일 때 유클리드)</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "ball_tree vs kd_tree"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"cmp-table\"><tr><th>알고리즘</th><th>구조</th><th>적합 상황</th></tr><tr><td>ball_tree</td><td>위치 + 반지름으로 공간 분할</td><td>고차원, 비유클리드 거리</td></tr><tr><td>kd_tree</td><td>축 기준 이진 분할</td><td>저차원(≤20), 유클리드 거리</td></tr><tr><td>brute</td><td>전수 계산</td><td>소규모 데이터셋</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.neighbors <span class=\"kw\">import</span> NearestNeighbors\n<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\nX = np.<span class=\"fn\">array</span>([[<span class=\"nm\">2.1</span>, <span class=\"nm\">1.3</span>], [<span class=\"nm\">1.3</span>, <span class=\"nm\">3.2</span>], [<span class=\"nm\">2.9</span>, <span class=\"nm\">2.5</span>]])\ntest_point = [<span class=\"nm\">2.5</span>, <span class=\"nm\">2.0</span>]\n\nknn = NearestNeighbors(n_neighbors=<span class=\"nm\">2</span>, algorithm=<span class=\"st\">'ball_tree'</span>).<span class=\"fn\">fit</span>(X)\ndistances, indices = knn.<span class=\"fn\">kneighbors</span>([test_point])\n\n<span class=\"fn\">print</span>(indices)    <span class=\"cm\"># [[0 2]] — 가장 가까운 2개 인덱스</span>\n<span class=\"fn\">print</span>(distances)  <span class=\"cm\"># [[0.538 0.539]] — 각 이웃까지의 거리</span>"
+        },
+        {
+          "type": "tip",
+          "html": "<code>kneighbors()</code>는 2D 입력을 받으므로 단일 포인트도 <code>[point]</code>처럼 리스트로 감싸야 한다. 반환값 <code>indices</code>의 shape은 <code>(쿼리 수, k)</code>."
+        }
+      ]
+    },
+    {
+      "fnName": "kneighbors()",
+      "badgeCls": "b-teal",
+      "badgeText": "거리 탐색",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "<code>fit()</code>된 NearestNeighbors 모델에서 쿼리 포인트의 k개 이웃 거리와 인덱스를 반환한다. 인수를 생략하면 훈련 데이터 자체에 대한 이웃을 반환한다(자기 자신 포함)."
+        },
+        {
+          "type": "slbl",
+          "text": "주요 파라미터"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>X</td><td>array-like</td><td>쿼리 포인트. 생략 시 훈련 데이터 사용</td></tr><tr><td>n_neighbors</td><td>int=None</td><td>반환할 이웃 수. 생략 시 모델의 n_neighbors 사용</td></tr><tr><td>return_distance</td><td>bool=True</td><td>False면 인덱스만 반환</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "distances, indices = knn.<span class=\"fn\">kneighbors</span>([test_point])\n\n<span class=\"cm\"># indices shape: (1, k) — 이웃 인덱스</span>\n<span class=\"cm\"># distances shape: (1, k) — 이웃까지의 거리</span>\n\n<span class=\"kw\">for</span> rank, idx <span class=\"kw\">in</span> <span class=\"fn\">enumerate</span>(indices[<span class=\"nm\">0</span>], start=<span class=\"nm\">1</span>):\n    <span class=\"fn\">print</span>(<span class=\"fn\">f</span><span class=\"st\">\"</span>{rank}<span class=\"st\">위: </span>{X[idx]}<span class=\"st\">\"</span>)"
+        }
+      ]
+    }
+  ],
+  "knn_classifier": [
+    {
+      "fnName": "KNeighborsClassifier()",
+      "badgeCls": "b-blue",
+      "badgeText": "분류",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "k개의 가장 가까운 이웃의 클래스 투표로 분류를 수행한다. <code>weights='uniform'</code>이면 동등한 투표권, <code>'distance'</code>면 거리의 역수 가중치를 부여해 가까운 이웃에 더 큰 영향력을 준다."
+        },
+        {
+          "type": "slbl",
+          "text": "주요 파라미터"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>n_neighbors</td><td>int=5</td><td>이웃 수 k. 홀수 권장(동점 방지)</td></tr><tr><td>weights</td><td>str='uniform'</td><td><code>uniform</code>: 균등 투표 / <code>distance</code>: 거리 역수 가중 투표</td></tr><tr><td>algorithm</td><td>str='auto'</td><td>탐색 알고리즘 (auto가 데이터에 따라 최적 선택)</td></tr><tr><td>metric</td><td>str='minkowski'</td><td>거리 측정 방식</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.neighbors <span class=\"kw\">import</span> KNeighborsClassifier\n<span class=\"kw\">from</span> sklearn.datasets <span class=\"kw\">import</span> load_iris\n<span class=\"kw\">from</span> sklearn.model_selection <span class=\"kw\">import</span> train_test_split\n\niris = <span class=\"fn\">load_iris</span>()\nX_train, X_test, y_train, y_test = <span class=\"fn\">train_test_split</span>(\n    iris.data, iris.target, test_size=<span class=\"nm\">0.2</span>, random_state=<span class=\"nm\">42</span>)\n\nknn = <span class=\"fn\">KNeighborsClassifier</span>(n_neighbors=<span class=\"nm\">5</span>, weights=<span class=\"st\">'uniform'</span>)\nknn.<span class=\"fn\">fit</span>(X_train, y_train)\n\n<span class=\"fn\">print</span>(knn.<span class=\"fn\">score</span>(X_test, y_test))  <span class=\"cm\"># 정확도</span>\ny_pred = knn.<span class=\"fn\">predict</span>(X_test)"
+        },
+        {
+          "type": "warn",
+          "html": "KNN은 거리 기반 모델이므로 <strong>스케일 정규화가 필수</strong>. 변수 범위가 다르면 큰 값의 변수가 거리를 지배한다. <code>StandardScaler</code> 또는 <code>MinMaxScaler</code>를 전처리로 반드시 적용할 것."
+        }
+      ]
+    },
+    {
+      "fnName": "KNeighborsRegressor()",
+      "badgeCls": "b-blue",
+      "badgeText": "회귀",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "k개의 가장 가까운 이웃의 타깃값 평균(또는 가중 평균)으로 연속값을 예측한다. <code>weights='distance'</code>를 사용하면 가까운 이웃의 값에 더 큰 가중치를 부여한 가중 평균을 계산한다."
+        },
+        {
+          "type": "slbl",
+          "text": "주요 파라미터"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>n_neighbors</td><td>int=5</td><td>이웃 수 k</td></tr><tr><td>weights</td><td>str='uniform'</td><td><code>uniform</code>: 단순 평균 / <code>distance</code>: 거리 역수 가중 평균</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.neighbors <span class=\"kw\">import</span> KNeighborsRegressor\n<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\nX = np.<span class=\"fn\">array</span>([[<span class=\"nm\">1</span>],[<span class=\"nm\">2</span>],[<span class=\"nm\">3</span>],[<span class=\"nm\">4</span>],[<span class=\"nm\">5</span>]])\ny = np.<span class=\"fn\">array</span>([<span class=\"nm\">10</span>,<span class=\"nm\">12</span>,<span class=\"nm\">14</span>,<span class=\"nm\">16</span>,<span class=\"nm\">18</span>])\n\nknn_reg = <span class=\"fn\">KNeighborsRegressor</span>(n_neighbors=<span class=\"nm\">3</span>, weights=<span class=\"st\">'distance'</span>)\nknn_reg.<span class=\"fn\">fit</span>(X, y)\n\ny_pred = knn_reg.<span class=\"fn\">predict</span>([[<span class=\"nm\">3.5</span>]])\n<span class=\"fn\">print</span>(y_pred)  <span class=\"cm\"># [15.xxx] — 가중 평균으로 예측</span>"
+        }
+      ]
+    },
+    {
+      "fnName": "weights 옵션 비교",
+      "badgeCls": "b-amber",
+      "badgeText": "하이퍼파라미터",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "<code>weights</code>는 이웃들의 투표/평균 방식을 결정한다. 경계가 복잡하거나 이웃 간 거리 차이가 클 때 <code>'distance'</code>가 더 나은 결과를 내는 경향이 있다."
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"cmp-table\"><tr><th>옵션</th><th>계산 방식</th><th>적합 상황</th></tr><tr><td>uniform</td><td>k개 이웃 동등 투표·평균</td><td>이웃 분포가 균일한 경우</td></tr><tr><td>distance</td><td>거리 역수 (1/d) 가중치 부여</td><td>가까운 이웃이 더 대표적인 경우</td></tr></table>"
+        },
+        {
+          "type": "tip",
+          "html": "k가 클수록 결정 경계가 부드러워져 과적합이 줄지만 과소적합 위험이 생긴다. 교차검증으로 최적 k를 탐색하는 것이 일반적."
+        }
+      ]
+    }
+  ],
+  "knn_advanced": [
+    {
+      "fnName": "KNeighborsTransformer()",
+      "badgeCls": "b-purple",
+      "badgeText": "고급 기능",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "데이터를 k-최근접 이웃 그래프(희소 행렬)로 변환하는 전처리기. <code>SpectralClustering</code>, <code>TSNE</code> 등 그래프 구조를 입력으로 받는 모델의 사전 처리 단계에서 사용하며, <code>networkx</code>와 연계해 시각화할 수 있다."
+        },
+        {
+          "type": "slbl",
+          "text": "주요 파라미터"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>n_neighbors</td><td>int=5</td><td>각 노드와 연결할 이웃 수</td></tr><tr><td>mode</td><td>str='distance'</td><td><code>distance</code>: 가중치에 거리값 저장 / <code>connectivity</code>: 0·1 이진 저장</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.neighbors <span class=\"kw\">import</span> KNeighborsTransformer\n<span class=\"kw\">from</span> sklearn.datasets <span class=\"kw\">import</span> make_moons\n<span class=\"kw\">import</span> networkx <span class=\"kw\">as</span> nx\n<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\nX, _ = <span class=\"fn\">make_moons</span>(n_samples=<span class=\"nm\">15</span>, noise=<span class=\"nm\">0.1</span>, random_state=<span class=\"nm\">42</span>)\n\nknn_t = <span class=\"fn\">KNeighborsTransformer</span>(n_neighbors=<span class=\"nm\">3</span>, mode=<span class=\"st\">'distance'</span>)\nknn_graph = knn_t.<span class=\"fn\">fit_transform</span>(X)  <span class=\"cm\"># 희소 행렬 반환</span>\n\n<span class=\"cm\"># 0보다 큰 엣지만 추출해 그래프 생성</span>\nedges = np.<span class=\"fn\">column_stack</span>(np.<span class=\"fn\">where</span>(knn_graph.<span class=\"fn\">toarray</span>() > <span class=\"nm\">0</span>))\nG = nx.<span class=\"fn\">Graph</span>()\nG.<span class=\"fn\">add_edges_from</span>(edges)\nnx.<span class=\"fn\">draw</span>(G, pos=X, with_labels=<span class=\"nm\">True</span>)"
+        },
+        {
+          "type": "tip",
+          "html": "<code>fit_transform()</code>의 반환값은 scipy 희소 행렬(CSR format). <code>.toarray()</code>로 밀집 행렬로 변환 후 엣지를 추출한다."
+        }
+      ]
+    },
+    {
+      "fnName": "Isomap()",
+      "badgeCls": "b-purple",
+      "badgeText": "차원 축소",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "KNN 그래프 위에서 측지선 거리(geodesic distance)를 계산해 고차원 매니폴드 구조를 보존하며 저차원으로 축소한다. 비선형 구조(예: 반달형 데이터)를 선형 PCA보다 잘 보존한다."
+        },
+        {
+          "type": "slbl",
+          "text": "주요 파라미터"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>n_neighbors</td><td>int=5</td><td>측지선 거리 계산에 사용할 이웃 수</td></tr><tr><td>n_components</td><td>int=2</td><td>축소할 차원 수</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.manifold <span class=\"kw\">import</span> Isomap\n\nisomap = <span class=\"fn\">Isomap</span>(n_neighbors=<span class=\"nm\">3</span>, n_components=<span class=\"nm\">1</span>)\nX_reduced = isomap.<span class=\"fn\">fit_transform</span>(X)  <span class=\"cm\"># shape: (n_samples, 1)</span>\n\n<span class=\"cm\"># 1차원으로 축소된 결과 시각화</span>\nplt.<span class=\"fn\">scatter</span>(X_reduced, np.<span class=\"fn\">zeros_like</span>(X_reduced), alpha=<span class=\"nm\">0.6</span>)"
+        }
+      ]
+    }
+  ],
+  "lof": [
+    {
+      "fnName": "LocalOutlierFactor()",
+      "badgeCls": "b-coral",
+      "badgeText": "이상치 탐지",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "각 데이터 포인트의 지역 밀도를 주변 이웃과 비교해 이상치를 탐지한다. 밀도가 주변보다 현저히 낮은 포인트가 이상치로 판별된다. 전역 기준이 아닌 <strong>지역(local) 밀도 기준</strong>이므로 밀도가 불균일한 데이터에도 효과적이다."
+        },
+        {
+          "type": "slbl",
+          "text": "주요 파라미터"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>n_neighbors</td><td>int=20</td><td>지역 밀도 계산에 사용할 이웃 수</td></tr><tr><td>contamination</td><td>float='auto'</td><td>이상치 비율 추정값. <code>'auto'</code> 또는 0~0.5 사이 값</td></tr><tr><td>novelty</td><td>bool=False</td><td>True면 새 데이터에 대한 예측 가능 (훈련 데이터는 이상치 판별 불가)</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.neighbors <span class=\"kw\">import</span> LocalOutlierFactor\n<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\nX = np.<span class=\"fn\">array</span>([[<span class=\"nm\">2.1</span>, <span class=\"nm\">1.3</span>], [<span class=\"nm\">2.9</span>, <span class=\"nm\">2.5</span>], [<span class=\"nm\">3.0</span>, <span class=\"nm\">2.0</span>],\n              [<span class=\"nm\">12.0</span>, <span class=\"nm\">12.0</span>]])  <span class=\"cm\"># 마지막이 이상치</span>\n\nlof = <span class=\"fn\">LocalOutlierFactor</span>(n_neighbors=<span class=\"nm\">3</span>)\nscores = lof.<span class=\"fn\">fit_predict</span>(X)\n<span class=\"cm\"># 정상: 1, 이상치: -1</span>\n<span class=\"fn\">print</span>(scores)  <span class=\"cm\"># [ 1  1  1 -1]</span>\n\n<span class=\"cm\"># 시각화: 점수에 따라 색상 분리</span>\nplt.<span class=\"fn\">scatter</span>(X[:,<span class=\"nm\">0</span>], X[:,<span class=\"nm\">1</span>], c=scores, cmap=<span class=\"st\">'coolwarm'</span>)"
+        },
+        {
+          "type": "warn",
+          "html": "기본 LOF(<code>novelty=False</code>)는 <strong>훈련 데이터에서만</strong> 이상치 판별이 가능하다. 새 데이터에 <code>predict()</code>를 호출하려면 <code>novelty=True</code>로 설정해야 한다."
+        }
+      ]
+    },
+    {
+      "fnName": "LOF 스코어 해석",
+      "badgeCls": "b-amber",
+      "badgeText": "스코어 해석",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "<code>fit_predict()</code>는 이진 레이블(<code>1</code>=정상, <code>-1</code>=이상치)을 반환한다. 내부적으로 계산되는 <code>negative_outlier_factor_</code>는 음수 LOF 점수로, 절댓값이 클수록 이상치 가능성이 높다."
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"cmp-table\"><tr><th>반환값</th><th>의미</th></tr><tr><td>1</td><td>정상 (주변 밀도와 유사)</td></tr><tr><td>-1</td><td>이상치 (주변보다 현저히 낮은 밀도)</td></tr></table>"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"cm\"># LOF 음수 점수 접근 — 절댓값이 클수록 이상치</span>\nlof = <span class=\"fn\">LocalOutlierFactor</span>(n_neighbors=<span class=\"nm\">3</span>)\nlof.<span class=\"fn\">fit_predict</span>(X)\n\nscores = lof.negative_outlier_factor_\n<span class=\"fn\">print</span>(scores)  <span class=\"cm\"># [-1.02, -1.01, -1.03, -8.5] 등</span>"
+        }
+      ]
+    }
+  ],
+  "kmeans": [
+    {
+      "fnName": "KMeans()",
+      "badgeCls": "b-blue",
+      "badgeText": "핵심 API",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "데이터를 k개의 군집으로 분할하는 비지도 학습 알고리즘. k개의 중심을 초기화 → 각 데이터를 가장 가까운 중심에 배정 → 중심 재계산을 반복하여 수렴한다. 군집의 의미를 파악하려면 <strong>중심값 분석이 필수</strong>."
+        },
+        {
+          "type": "slbl",
+          "text": "주요 파라미터"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>n_clusters</td><td>int=8</td><td>군집 수 k — 사전에 지정해야 함</td></tr><tr><td>init</td><td>str='k-means++'</td><td>중심 초기화 방법. <code>k-means++</code>가 수렴 안정성 높음</td></tr><tr><td>n_init</td><td>int=10</td><td>다른 초기화로 반복 실행 수. 최적 결과 선택</td></tr><tr><td>max_iter</td><td>int=300</td><td>한 번의 실행에서 최대 반복 횟수</td></tr><tr><td>random_state</td><td>int=None</td><td>재현성을 위해 고정 권장</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "주요 속성"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>labels_</td><td>array (n_samples,)</td><td>각 데이터 포인트의 군집 번호</td></tr><tr><td>cluster_centers_</td><td>array (k, n_features)</td><td>k개 군집의 중심 좌표</td></tr><tr><td>inertia_</td><td>float</td><td>WSS — 군집 내 중심까지 거리의 제곱합. 작을수록 응집도 높음</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.cluster <span class=\"kw\">import</span> KMeans\n<span class=\"kw\">from</span> sklearn.datasets <span class=\"kw\">import</span> load_iris\n\niris = <span class=\"fn\">load_iris</span>()\nX = iris.data[:, :<span class=\"nm\">2</span>]\n\nkm = <span class=\"fn\">KMeans</span>(n_clusters=<span class=\"nm\">3</span>, random_state=<span class=\"nm\">42</span>)\nkm.<span class=\"fn\">fit</span>(X)\n\n<span class=\"fn\">print</span>(km.labels_)           <span class=\"cm\"># 각 포인트의 군집 번호</span>\n<span class=\"fn\">print</span>(km.cluster_centers_)  <span class=\"cm\"># shape: (3, 2)</span>\n<span class=\"fn\">print</span>(km.inertia_)          <span class=\"cm\"># WSS 값</span>"
+        },
+        {
+          "type": "warn",
+          "html": "KMeans도 <strong>거리 기반 알고리즘</strong>이므로 스케일 정규화 필수. 또한 구형(spherical) 군집에 적합하며, 비볼록(non-convex) 형태의 군집에는 DBSCAN이 더 적합하다."
+        }
+      ]
+    },
+    {
+      "fnName": "엘보우 방법 — k 결정",
+      "badgeCls": "b-amber",
+      "badgeText": "하이퍼파라미터",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "k를 늘릴수록 <code>inertia_</code>(WSS)는 감소하지만 어느 지점에서 감소폭이 급격히 줄어든다. 이 꺾이는 지점(elbow)을 최적 k로 선택한다."
+        },
+        {
+          "type": "pre",
+          "html": "inertias = []\n<span class=\"kw\">for</span> k <span class=\"kw\">in</span> <span class=\"fn\">range</span>(<span class=\"nm\">1</span>, <span class=\"nm\">11</span>):\n    km = <span class=\"fn\">KMeans</span>(n_clusters=k, random_state=<span class=\"nm\">42</span>)\n    km.<span class=\"fn\">fit</span>(X)\n    inertias.<span class=\"fn\">append</span>(km.inertia_)\n\nplt.<span class=\"fn\">plot</span>(<span class=\"fn\">range</span>(<span class=\"nm\">1</span>, <span class=\"nm\">11</span>), inertias, marker=<span class=\"st\">'o'</span>)\nplt.<span class=\"fn\">xlabel</span>(<span class=\"st\">'k'</span>)\nplt.<span class=\"fn\">ylabel</span>(<span class=\"st\">'Inertia (WSS)'</span>)\nplt.<span class=\"fn\">title</span>(<span class=\"st\">'Elbow Method'</span>)  <span class=\"cm\"># 꺾이는 지점이 최적 k</span>"
+        },
+        {
+          "type": "tip",
+          "html": "엘보우가 명확하지 않을 때는 실루엣 계수(<code>silhouette_score</code>)를 함께 사용해 k를 결정한다."
+        }
+      ]
+    },
+    {
+      "fnName": "transform() — 거리 행렬",
+      "badgeCls": "b-teal",
+      "badgeText": "변환",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "각 데이터 포인트에서 k개 군집 중심까지의 거리를 반환한다. <code>predict()</code>와 달리 군집 번호 대신 거리 행렬을 반환해 이상치 탐지나 특성 변환에 활용할 수 있다."
+        },
+        {
+          "type": "pre",
+          "html": "km = <span class=\"fn\">KMeans</span>(n_clusters=<span class=\"nm\">1</span>).<span class=\"fn\">fit</span>(X)\n\n<span class=\"cm\"># 각 포인트 → 중심까지 거리, shape: (n_samples, k)</span>\ndistances = km.<span class=\"fn\">transform</span>(X)\n\n<span class=\"cm\"># 임계값 기반 이상치 탐지</span>\nthreshold = np.<span class=\"fn\">percentile</span>(distances, <span class=\"nm\">95</span>)  <span class=\"cm\"># 상위 5%를 이상치로</span>\noutliers = X[distances.<span class=\"fn\">ravel</span>() > threshold]\n\n<span class=\"cm\"># 인덱스 기반 이상치 탐지</span>\nsorted_idx = np.<span class=\"fn\">argsort</span>(distances.<span class=\"fn\">ravel</span>())[::-<span class=\"nm\">1</span>][:<span class=\"nm\">5</span>]  <span class=\"cm\"># 가장 먼 5개</span>"
+        },
+        {
+          "type": "tip",
+          "html": "<code>n_clusters=1</code>로 단일 군집을 학습하면 원형 이상치 탐지에 사용할 수 있다. <code>percentile</code>로 임계값을 동적으로 설정하면 데이터 크기에 무관하게 비율로 이상치를 정의할 수 있다."
+        }
+      ]
+    }
+  ],
+  "kmeans_eval": [
+    {
+      "fnName": "silhouette_score()",
+      "badgeCls": "b-teal",
+      "badgeText": "평가",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "군집 전체의 평균 실루엣 계수를 반환한다. 실루엣 계수는 <code>(b - a) / max(a, b)</code>로 계산되며, <code>a</code>는 같은 군집 내 평균 거리, <code>b</code>는 가장 가까운 타 군집과의 평균 거리다. <strong>1에 가까울수록 좋은 군집화</strong>."
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"cmp-table\"><tr><th>값 범위</th><th>의미</th></tr><tr><td>1에 가까움</td><td>군집이 잘 분리되고 응집됨</td></tr><tr><td>0 근방</td><td>경계선에 위치 (군집 판별 불명확)</td></tr><tr><td>음수</td><td>잘못된 군집에 배정됨</td></tr></table>"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.metrics <span class=\"kw\">import</span> silhouette_score, silhouette_samples\n\n<span class=\"cm\"># 전체 평균 실루엣 계수</span>\nscore = <span class=\"fn\">silhouette_score</span>(X, km.labels_)\n<span class=\"fn\">print</span>(<span class=\"fn\">f</span><span class=\"st\">\"실루엣 계수: </span>{score:.4f}<span class=\"st\">\"</span>)\n\n<span class=\"cm\"># 여러 k 비교</span>\n<span class=\"kw\">for</span> k, km_model <span class=\"kw\">in</span> [(km2, km2), (km3, km3)]:\n    s = <span class=\"fn\">silhouette_score</span>(X, km_model.labels_)\n    <span class=\"fn\">print</span>(<span class=\"fn\">f</span><span class=\"st\">\"k={k}: {s:.4f}\"</span>)"
+        }
+      ]
+    },
+    {
+      "fnName": "silhouette_samples()",
+      "badgeCls": "b-teal",
+      "badgeText": "샘플별 평가",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "각 데이터 포인트별 실루엣 계수를 배열로 반환한다. <code>silhouette_score()</code>가 전체 평균이라면, 이 함수는 군집별 분포를 시각화해 특정 군집의 품질을 세밀하게 진단할 수 있다."
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"cm\"># 각 샘플의 실루엣 계수, shape: (n_samples,)</span>\nvals = <span class=\"fn\">silhouette_samples</span>(X, km.labels_)\n\n<span class=\"cm\"># 군집별 실루엣 시각화 (fill_betweenx 패턴)</span>\ny_lower = <span class=\"nm\">10</span>\n<span class=\"kw\">for</span> i <span class=\"kw\">in</span> np.<span class=\"fn\">unique</span>(km.labels_):\n    cluster_vals = vals[km.labels_ == i]\n    cluster_vals.<span class=\"fn\">sort</span>()\n    y_upper = y_lower + <span class=\"fn\">len</span>(cluster_vals)\n    plt.<span class=\"fn\">fill_betweenx</span>(np.<span class=\"fn\">arange</span>(y_lower, y_upper),\n                       <span class=\"nm\">0</span>, cluster_vals, alpha=<span class=\"nm\">0.7</span>)\n    y_lower = y_upper + <span class=\"nm\">10</span>\n\n<span class=\"cm\"># 평균선 표시</span>\nplt.<span class=\"fn\">axvline</span>(x=<span class=\"fn\">silhouette_score</span>(X, km.labels_),\n           color=<span class=\"st\">'red'</span>, linestyle=<span class=\"st\">'--'</span>)"
+        },
+        {
+          "type": "tip",
+          "html": "실루엣 플롯에서 각 군집의 막대 폭이 비슷하고, 모든 값이 평균선을 넘으면 이상적인 군집화. 특정 군집만 평균보다 낮으면 해당 군집의 k 분할이 부적절한 신호."
+        }
+      ]
+    }
+  ],
+  "kmeans_advanced": [
+    {
+      "fnName": "이미지 컬러 양자화",
+      "badgeCls": "b-purple",
+      "badgeText": "응용",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "이미지의 각 픽셀(RGB 3차원 벡터)을 KMeans로 군집화해 원본 색상 수를 k개의 대표 색상으로 압축한다. 군집 중심값(codebook)과 라벨만 저장하면 이미지를 경량화해 전송·저장할 수 있다."
+        },
+        {
+          "type": "slbl",
+          "text": "처리 흐름"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"cmp-table\"><tr><th>단계</th><th>처리</th></tr><tr><td>1. 이미지 로드</td><td><code>plt.imread()</code> → shape: (H, W, 3)</td></tr><tr><td>2. 정규화</td><td><code>/ 255.</code> → float64 변환</td></tr><tr><td>3. 2D 변환</td><td><code>reshape(H*W, 3)</code> → 픽셀을 행으로</td></tr><tr><td>4. KMeans 학습</td><td>n_clusters=k로 대표 색상 추출</td></tr><tr><td>5. 재구성</td><td><code>centers[labels].reshape(H, W, 3)</code></td></tr></table>"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n<span class=\"kw\">from</span> sklearn.cluster <span class=\"kw\">import</span> KMeans\n\nimage = plt.<span class=\"fn\">imread</span>(<span class=\"st\">'image.jpg'</span>)\nH, W, D = image.shape\n\n<span class=\"cm\"># 정규화 + 2D 변환</span>\nimage_2d = (image / <span class=\"nm\">255.</span>).<span class=\"fn\">reshape</span>(H * W, D)\n\nkm = <span class=\"fn\">KMeans</span>(n_clusters=<span class=\"nm\">32</span>, random_state=<span class=\"nm\">0</span>).<span class=\"fn\">fit</span>(image_2d)\n\n<span class=\"cm\"># 대표 색상으로 이미지 재구성</span>\nreconstructed = km.cluster_centers_[km.labels_].<span class=\"fn\">reshape</span>(H, W, D)\nplt.<span class=\"fn\">imshow</span>(reconstructed)\n\n<span class=\"cm\"># uint8로 변환해 출력</span>\nplt.<span class=\"fn\">imshow</span>((reconstructed * <span class=\"nm\">255</span>).<span class=\"fn\">astype</span>(np.uint8))"
+        },
+        {
+          "type": "tip",
+          "html": "대용량 이미지는 학습 시간이 길다. <code>shuffle(image_2d)[:1000]</code>으로 샘플 1000개만 학습한 뒤 전체 이미지에 <code>predict()</code>를 적용하면 속도를 크게 개선할 수 있다."
+        }
+      ]
+    },
+    {
+      "fnName": "단일 군집 이상치 탐지",
+      "badgeCls": "b-coral",
+      "badgeText": "이상치 탐지",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "<code>n_clusters=1</code>로 단일 중심을 학습하고 <code>transform()</code>으로 각 포인트의 중심 거리를 구한다. 거리가 임계값보다 먼 포인트를 이상치로 판별하는 간단한 원형 이상치 탐지 방법."
+        },
+        {
+          "type": "pre",
+          "html": "km = <span class=\"fn\">KMeans</span>(n_clusters=<span class=\"nm\">1</span>).<span class=\"fn\">fit</span>(X)\ndistances = km.<span class=\"fn\">transform</span>(X)  <span class=\"cm\"># shape: (n_samples, 1)</span>\n\n<span class=\"cm\"># 방법 1: 고정 임계값</span>\nthreshold = <span class=\"nm\">2.0</span>\noutliers = X[distances.<span class=\"fn\">ravel</span>() > threshold]\n\n<span class=\"cm\"># 방법 2: 백분위수 기반 (상위 5%를 이상치로)</span>\nthreshold = np.<span class=\"fn\">percentile</span>(distances, <span class=\"nm\">95</span>)\nresult = distances.<span class=\"fn\">ravel</span>() > threshold\n\n<span class=\"cm\"># 방법 3: 인덱스 기반 (가장 먼 n개)</span>\nsorted_idx = np.<span class=\"fn\">argsort</span>(distances.<span class=\"fn\">ravel</span>())[::-<span class=\"nm\">1</span>][:<span class=\"nm\">5</span>]"
+        }
+      ]
+    },
+    {
+      "fnName": "PCA + KNN 파이프라인",
+      "badgeCls": "b-purple",
+      "badgeText": "응용",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "고차원 이미지 데이터(예: 얼굴 이미지 5655차원)에 KNN을 직접 적용하면 차원의 저주로 성능이 낮다. PCA로 차원을 축소한 후 KNN을 적용하면 노이즈 제거와 계산 효율이 동시에 개선된다."
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.decomposition <span class=\"kw\">import</span> PCA\n<span class=\"kw\">from</span> sklearn.neighbors <span class=\"kw\">import</span> KNeighborsClassifier\n\n<span class=\"cm\"># 5655차원 → 100차원 축소 (백색화로 분산 균일화)</span>\npca = <span class=\"fn\">PCA</span>(n_components=<span class=\"nm\">100</span>, whiten=<span class=\"nm\">True</span>, random_state=<span class=\"nm\">0</span>)\npca.<span class=\"fn\">fit</span>(X_train)\nX_train_pca = pca.<span class=\"fn\">transform</span>(X_train)\nX_test_pca  = pca.<span class=\"fn\">transform</span>(X_test)\n\nknn = <span class=\"fn\">KNeighborsClassifier</span>(n_neighbors=<span class=\"nm\">1</span>)\nknn.<span class=\"fn\">fit</span>(X_train_pca, y_train)\n<span class=\"fn\">print</span>(knn.<span class=\"fn\">score</span>(X_test_pca, y_test))  <span class=\"cm\"># 0.22 → 0.30으로 향상</span>"
+        },
+        {
+          "type": "tip",
+          "html": "<code>whiten=True</code>(백색화)는 각 주성분을 표준편차로 나눠 모든 성분의 분산을 동일하게 만든다. KNN처럼 거리 기반 모델에서 특히 효과적이며, 중요도가 낮은 주성분이 거리를 지배하는 것을 방지한다."
+        }
+      ]
+    }
+  ],
+  "hierarchical": [
+    {
+      "fnName": "ward() + dendrogram()",
+      "badgeCls": "b-blue",
+      "badgeText": "핵심 API",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "계층적 군집화는 모든 포인트를 개별 군집으로 시작해 가장 가까운 두 군집을 반복적으로 병합한다. KMeans처럼 k를 미리 지정하지 않아도 되며, <strong>덴드로그램으로 적절한 k를 시각적으로 결정</strong>하는 용도로 주로 쓰인다."
+        },
+        {
+          "type": "slbl",
+          "text": "연결법 종류"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"cmp-table\"><tr><th>연결법</th><th>기준</th><th>특징</th></tr><tr><td>최단 연결</td><td>두 군집 간 최솟값 거리</td><td>사슬형 군집 생성 경향</td></tr><tr><td>최장 연결</td><td>두 군집 간 최댓값 거리</td><td>구형 군집 선호</td></tr><tr><td>평균 연결</td><td>두 군집 간 평균 거리</td><td>중간 특성</td></tr><tr><td><strong>ward</strong></td><td>병합 시 분산 증가량 최소화</td><td>균일한 크기의 군집 형성, 가장 많이 사용</td></tr></table>"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> scipy.cluster.hierarchy <span class=\"kw\">import</span> dendrogram, ward\n<span class=\"kw\">from</span> sklearn.datasets <span class=\"kw\">import</span> make_blobs\n\nX, y = <span class=\"fn\">make_blobs</span>(random_state=<span class=\"nm\">0</span>, n_samples=<span class=\"nm\">12</span>)\nlinkage_array = <span class=\"fn\">ward</span>(X)  <span class=\"cm\"># 군집 간 거리값 계산</span>\n<span class=\"fn\">dendrogram</span>(linkage_array)   <span class=\"cm\"># 덴드로그램 시각화</span>\n\n<span class=\"cm\"># 수평선으로 군집 수 결정 시각화</span>\nax = plt.<span class=\"fn\">gca</span>()\nbounds = ax.<span class=\"fn\">get_xbound</span>()\nax.<span class=\"fn\">plot</span>(bounds, [<span class=\"nm\">7.25</span>, <span class=\"nm\">7.25</span>], <span class=\"st\">'--'</span>, c=<span class=\"st\">'k'</span>)  <span class=\"cm\"># k=2 분할선</span>\nax.<span class=\"fn\">plot</span>(bounds, [<span class=\"nm\">4</span>, <span class=\"nm\">4</span>], <span class=\"st\">'--'</span>, c=<span class=\"st\">'k'</span>)        <span class=\"cm\"># k=3 분할선</span>"
+        },
+        {
+          "type": "tip",
+          "html": "덴드로그램에서 수평선을 그었을 때 세로 막대를 가로지르는 횟수가 군집 수 k가 된다. 수평선이 <strong>가장 긴 세로 막대를 통과하는 높이</strong>가 최적 k 구분점."
+        }
+      ]
+    },
+    {
+      "fnName": "AgglomerativeClustering()",
+      "badgeCls": "b-teal",
+      "badgeText": "sklearn API",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "scipy의 <code>ward()</code>가 덴드로그램 시각화에 특화됐다면, sklearn의 <code>AgglomerativeClustering</code>은 군집 레이블이 필요할 때 사용한다. k를 지정하면 그 수만큼 군집을 분할한 레이블을 반환한다."
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>n_clusters</td><td>int=2</td><td>최종 군집 수</td></tr><tr><td>linkage</td><td>str='ward'</td><td>연결법: <code>ward</code> · <code>complete</code> · <code>average</code> · <code>single</code></td></tr></table>"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.cluster <span class=\"kw\">import</span> AgglomerativeClustering\n\nagg = <span class=\"fn\">AgglomerativeClustering</span>(n_clusters=<span class=\"nm\">3</span>, linkage=<span class=\"st\">'ward'</span>)\nlabels = agg.<span class=\"fn\">fit_predict</span>(X)\n<span class=\"fn\">print</span>(labels)  <span class=\"cm\"># 각 포인트의 군집 번호</span>"
+        }
+      ]
+    }
+  ],
+  "dbscan": [
+    {
+      "fnName": "DBSCAN()",
+      "badgeCls": "b-blue",
+      "badgeText": "핵심 API",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "밀도 기반 군집화 알고리즘. k값 없이 epsilon 반경 내 최소 포인트 수(min_samples)를 기준으로 군집을 자동 탐지한다. 군집에 속하지 못한 포인트는 <strong>자동으로 이상치(-1)</strong>로 처리되며, 비구형 군집(반달형 등)에도 잘 동작한다."
+        },
+        {
+          "type": "slbl",
+          "text": "주요 파라미터"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>eps</td><td>float=0.5</td><td>이웃 반경. 작을수록 군집 수 증가, 이상치 증가</td></tr><tr><td>min_samples</td><td>int=5</td><td>핵심 포인트 조건의 최소 이웃 수. 클수록 군집 수 감소</td></tr><tr><td>metric</td><td>str='euclidean'</td><td>거리 측정 방식</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.cluster <span class=\"kw\">import</span> DBSCAN\n<span class=\"kw\">from</span> sklearn.preprocessing <span class=\"kw\">import</span> StandardScaler\n<span class=\"kw\">from</span> sklearn.datasets <span class=\"kw\">import</span> make_moons\n\nX, y = <span class=\"fn\">make_moons</span>(n_samples=<span class=\"nm\">200</span>, noise=<span class=\"nm\">0.05</span>, random_state=<span class=\"nm\">0</span>)\n\n<span class=\"cm\"># 거리 기반이므로 정규화 필수</span>\nscaler = <span class=\"fn\">StandardScaler</span>()\nX_scaled = scaler.<span class=\"fn\">fit_transform</span>(X)\n\ndbscan = <span class=\"fn\">DBSCAN</span>(eps=<span class=\"nm\">0.5</span>, min_samples=<span class=\"nm\">10</span>)\nclusters = dbscan.<span class=\"fn\">fit_predict</span>(X_scaled)\n\n<span class=\"cm\"># -1은 이상치(노이즈), 0부터 군집 번호</span>\n<span class=\"fn\">print</span>(np.<span class=\"fn\">unique</span>(clusters))\nplt.<span class=\"fn\">scatter</span>(X_scaled[:,<span class=\"nm\">0</span>], X_scaled[:,<span class=\"nm\">1</span>],\n           c=clusters, edgecolors=<span class=\"st\">'black'</span>)"
+        },
+        {
+          "type": "warn",
+          "html": "<code>eps</code>와 <code>min_samples</code>는 데이터 스케일에 민감하다. <strong>반드시 StandardScaler로 정규화 후 적용</strong>할 것. eps가 너무 작으면 대부분 이상치로 처리되고, 너무 크면 모든 데이터가 하나의 군집이 된다."
+        }
+      ]
+    },
+    {
+      "fnName": "DBSCAN vs KMeans 비교",
+      "badgeCls": "b-amber",
+      "badgeText": "알고리즘 비교",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "두 알고리즘은 서로 보완적이다. 군집의 형태와 데이터 특성에 따라 알고리즘을 선택한다."
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"cmp-table\"><tr><th>항목</th><th>KMeans</th><th>DBSCAN</th></tr><tr><td>k 지정</td><td>필수</td><td>불필요</td></tr><tr><td>군집 형태</td><td>구형(볼록)</td><td>임의 형태(비볼록 가능)</td></tr><tr><td>이상치 처리</td><td>군집에 강제 배정</td><td>자동으로 -1 처리</td></tr><tr><td>스케일 민감도</td><td>민감 (정규화 필수)</td><td>민감 (정규화 필수)</td></tr><tr><td>속도</td><td>빠름 (대용량 적합)</td><td>상대적으로 느림</td></tr><tr><td>적합 데이터</td><td>구형, 균일 크기 군집</td><td>불규칙 형태, 노이즈 포함 데이터</td></tr></table>"
+        }
+      ]
+    }
+  ]
+}
