@@ -1,0 +1,195 @@
+{
+  "svd": [
+    {
+      "fnName": "np.linalg.svd() — 특이값 분해",
+      "badgeCls": "b-blue",
+      "badgeText": "핵심",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "행렬 A를 세 행렬 U, S, Vt의 곱으로 분해한다. PCA가 정방행렬(공분산행렬)을 대상으로 하는 반면, SVD는 <code>m×n</code> 비정방행렬에도 적용된다. 희소행렬 특징 추출, 텍스트 잠재변수 발견, 주성분분석의 내부 엔진으로 사용된다."},
+        {"type": "slbl", "text": "반환값"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>U</td><td>ndarray (m×m)</td><td>왼쪽 특이행렬 — 행이 원본 공간의 기저</td></tr><tr><td>s</td><td>ndarray (k,)</td><td>특이값 벡터 — PCA 고유값의 제곱근</td></tr><tr><td>Vt</td><td>ndarray (n×n)</td><td>오른쪽 특이행렬의 전치 — 행이 새 축</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\nA = np.<span class=\"fn\">array</span>([[<span class=\"nm\">1</span>,<span class=\"nm\">2</span>,<span class=\"nm\">3</span>],[<span class=\"nm\">4</span>,<span class=\"nm\">5</span>,<span class=\"nm\">6</span>]])  <span class=\"cm\"># 2×3 비정방행렬</span>\nU, s, Vt = np.linalg.<span class=\"fn\">svd</span>(A)\n\nprint(U.shape)   <span class=\"cm\"># (2, 2)</span>\nprint(s.shape)   <span class=\"cm\"># (2,)  — min(m,n)개의 특이값</span>\nprint(Vt.shape)  <span class=\"cm\"># (3, 3)</span>\n\n<span class=\"cm\"># 복원 검증 — U @ diag(s) @ Vt ≈ A</span>\nSig = np.<span class=\"fn\">zeros</span>(A.shape)\nSig[:<span class=\"nm\">2</span>, :<span class=\"nm\">2</span>] = np.<span class=\"fn\">diag</span>(s)\nprint(np.linalg.<span class=\"fn\">norm</span>(A - U @ Sig @ Vt) < <span class=\"nm\">1e-10</span>)  <span class=\"cm\"># True</span>"},
+        {"type": "tip", "html": "PCA 내부도 SVD로 구현된다. <code>pca.singular_values_</code>가 SVD의 <code>s</code>와 동일하고, <code>pca.components_</code>가 <code>Vt</code>에 해당한다."}
+      ]
+    },
+    {
+      "fnName": "scipy.linalg.svd() + diagsvd()",
+      "badgeCls": "b-teal",
+      "badgeText": "변환",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "<code>scipy.linalg.svd</code>는 numpy와 동일한 분해를 수행하지만 <code>diagsvd()</code>로 특이값 벡터를 올바른 크기의 대각행렬 Σ로 확장할 수 있다. <code>full_matrices=False</code>로 thin SVD를 구할 때 특히 유용하다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>a</td><td>ndarray</td><td>분해할 입력 행렬</td></tr><tr><td>full_matrices</td><td>bool=True</td><td>False → thin SVD (U: m×k, Vt: k×n)</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> scipy <span class=\"kw\">import</span> linalg\n<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\nA = np.<span class=\"fn\">array</span>([[<span class=\"nm\">1</span>,<span class=\"nm\">2</span>,<span class=\"nm\">3</span>],[<span class=\"nm\">4</span>,<span class=\"nm\">5</span>,<span class=\"nm\">6</span>]])\nM, N = A.shape  <span class=\"cm\"># 2, 3</span>\n\nU, s, Vh = linalg.<span class=\"fn\">svd</span>(A)\nSig = linalg.<span class=\"fn\">diagsvd</span>(s, M, N)  <span class=\"cm\"># (2,) → 2×3 대각행렬</span>\n\nprint(np.<span class=\"fn\">allclose</span>(A, U @ Sig @ Vh))  <span class=\"cm\"># True</span>\n<span class=\"cm\"># 특이값은 PCA 고유값의 절반 크기</span>"},
+        {"type": "warn", "html": "<code>s</code>는 벡터라 바로 행렬곱 불가 — <code>diagsvd(s, M, N)</code>으로 m×n 형태로 맞춰야 한다."}
+      ]
+    },
+    {
+      "fnName": "TruncatedSVD — 희소행렬·텍스트",
+      "badgeCls": "b-purple",
+      "badgeText": "고급",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "원본 데이터를 직접 사용하는 SVD (평균을 빼지 않음). 희소행렬(<code>csr_matrix</code>)을 메모리에 올리지 않고 상위 k개의 특이값만 계산한다. TF-IDF 행렬의 잠재변수 추출(LSA), 장바구니 분석 등에 쓰인다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>n_components</td><td>int</td><td>추출할 토픽(잠재변수) 수</td></tr><tr><td>n_iter</td><td>int=5</td><td>랜덤 SVD 반복 횟수 — 클수록 정확</td></tr><tr><td>random_state</td><td>int=None</td><td>재현성 고정</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시 — 희소행렬 차원 축소"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.decomposition <span class=\"kw\">import</span> TruncatedSVD\n<span class=\"kw\">from</span> scipy.sparse <span class=\"kw\">import</span> csr_matrix\n<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\nnp.random.<span class=\"fn\">seed</span>(<span class=\"nm\">0</span>)\nX_dense = np.random.<span class=\"fn\">rand</span>(<span class=\"nm\">100</span>, <span class=\"nm\">100</span>)\nX_dense[:, <span class=\"nm\">2</span> * np.<span class=\"fn\">arange</span>(<span class=\"nm\">50</span>)] = <span class=\"nm\">0</span>  <span class=\"cm\"># 절반 열을 0으로</span>\nX = <span class=\"fn\">csr_matrix</span>(X_dense)            <span class=\"cm\"># 압축 희소행렬</span>\n\nsvd = <span class=\"fn\">TruncatedSVD</span>(n_components=<span class=\"nm\">5</span>, n_iter=<span class=\"nm\">7</span>, random_state=<span class=\"nm\">42</span>)\nsvd.<span class=\"fn\">fit</span>(X)\nprint(svd.explained_variance_ratio_)       <span class=\"cm\"># 각 성분 설명 비율</span>\nprint(svd.explained_variance_ratio_.<span class=\"fn\">sum</span>()) <span class=\"cm\"># 누적 설명 비율</span>"},
+        {"type": "slbl", "text": "term-document 행렬 SVD (LSA 개념)"},
+        {"type": "pre", "html": "<span class=\"cm\"># 단어-문서 행렬: 행=단어, 열=문서</span>\nA = np.<span class=\"fn\">array</span>([[<span class=\"nm\">3</span>,<span class=\"nm\">0</span>,<span class=\"nm\">2</span>],\n              [<span class=\"nm\">2</span>,<span class=\"nm\">3</span>,<span class=\"nm\">0</span>],\n              [<span class=\"nm\">0</span>,<span class=\"nm\">3</span>,<span class=\"nm\">5</span>]])\nU, s, VT = np.linalg.<span class=\"fn\">svd</span>(A)\n<span class=\"cm\"># U : 단어-토픽 행렬 (행=단어, 열=잠재 토픽)</span>\n<span class=\"cm\"># VT: 토픽-문서 행렬 (행=잠재 토픽, 열=문서)</span>\n<span class=\"cm\"># s : 각 토픽의 중요도 (특이값)</span>\nprint(<span class=\"st\">\"단어-토픽:\\n\"</span>, U.<span class=\"fn\">round</span>(<span class=\"nm\">3</span>))\nprint(<span class=\"st\">\"토픽-문서:\\n\"</span>, VT.<span class=\"fn\">round</span>(<span class=\"nm\">3</span>))"},
+        {"type": "tip", "html": "TruncatedSVD는 평균을 빼지 않으므로 PCA와 결과가 다르다. 밀집 행렬에는 PCA를, 희소행렬(TF-IDF 등)에는 TruncatedSVD를 쓰는 것이 표준 관행이다."}
+      ]
+    }
+  ],
+  "pca_core": [
+    {
+      "fnName": "PCA() — 주성분분석",
+      "badgeCls": "b-blue",
+      "badgeText": "핵심",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "공분산행렬의 고유값 분해(내부적으로 SVD)를 통해 분산이 최대화되는 새 축을 찾아 차원을 줄인다. 원본 변수 전체가 새 축(주성분) 구성에 참여하므로 <code>n_components=2</code>라도 원본 4개 변수를 모두 반영한다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>n_components</td><td>int | float | None</td><td>정수: 주성분 수. float(0~1): 설명분산 비율 기준으로 자동 결정. None: min(n_samples, n_features)</td></tr><tr><td>svd_solver</td><td>str=&#39;auto&#39;</td><td>&#39;full&#39; | &#39;randomized&#39; | &#39;arpack&#39; — 대용량엔 randomized</td></tr><tr><td>random_state</td><td>int=None</td><td>randomized solver 재현성</td></tr></table>"},
+        {"type": "slbl", "text": "주요 속성"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>explained_variance_ratio_</td><td>ndarray</td><td>각 주성분이 설명하는 분산 비율</td></tr><tr><td>singular_values_</td><td>ndarray</td><td>내부 SVD의 특이값 (고유값의 제곱근)</td></tr><tr><td>components_</td><td>ndarray (k×n)</td><td>주성분 벡터 — SVD의 Vt에 해당</td></tr><tr><td>n_components_</td><td>int</td><td>float 지정 시 실제 선택된 성분 수</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시 — iris 4차원 → 2차원"},
+        {"type": "pre", "html": "<span class=\"kw\">import</span> seaborn <span class=\"kw\">as</span> sns\n<span class=\"kw\">from</span> sklearn.decomposition <span class=\"kw\">import</span> PCA\n\niris = sns.<span class=\"fn\">load_dataset</span>(<span class=\"st\">\"iris\"</span>)\nX = iris.iloc[:, :<span class=\"nm\">4</span>]\n\nmodel = <span class=\"fn\">PCA</span>(n_components=<span class=\"nm\">2</span>)\nmodel.<span class=\"fn\">fit</span>(X)\nX_2D = model.<span class=\"fn\">transform</span>(X)  <span class=\"cm\"># (150, 4) → (150, 2)</span>\n\nprint(model.explained_variance_ratio_)        <span class=\"cm\"># [0.9246, 0.0531]</span>\nprint(model.explained_variance_ratio_.<span class=\"fn\">sum</span>()) <span class=\"cm\"># ~0.977</span>"},
+        {"type": "tip", "html": "<code>n_components=0.95</code>처럼 float을 넣으면 누적 설명분산이 95%를 넘는 최소 주성분 수를 자동 선택한다. MNIST(784차원) 예시에서는 154개로 줄었다."}
+      ]
+    },
+    {
+      "fnName": "inverse_transform() — 복원 및 노이즈 제거",
+      "badgeCls": "b-teal",
+      "badgeText": "변환",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "축소된 저차원 표현을 원본 차원으로 역변환한다. 완벽 복원은 불가능하지만 버려진 하위 주성분(노이즈)이 제거된 부드러운 데이터가 반환된다. 이미지 노이즈 제거, 이상치 탐지에 활용된다."},
+        {"type": "slbl", "text": "코드 예시 — MNIST 노이즈 제거"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.decomposition <span class=\"kw\">import</span> PCA\n\n<span class=\"cm\"># 학습 데이터 (60000, 784) reshape</span>\ntrain_x = train_x.<span class=\"fn\">reshape</span>(-<span class=\"nm\">1</span>, <span class=\"nm\">28</span>*<span class=\"nm\">28</span>)\n\npca = <span class=\"fn\">PCA</span>(n_components=<span class=\"nm\">0.95</span>)      <span class=\"cm\"># 설명분산 95% 기준 자동 결정</span>\nX_reduced  = pca.<span class=\"fn\">fit_transform</span>(train_x)  <span class=\"cm\"># (60000, 784) → (60000, 154)</span>\nX_recovered = pca.<span class=\"fn\">inverse_transform</span>(X_reduced)  <span class=\"cm\"># (60000, 154) → (60000, 784)</span>\n\n<span class=\"cm\"># X_recovered : 노이즈가 제거된 복원 이미지</span>\n<span class=\"cm\"># 784 → 154 → 784 과정에서 하위 성분(노이즈) 탈락</span>\nprint(pca.n_components_)  <span class=\"cm\"># 154</span>"},
+        {"type": "warn", "html": "복원 데이터는 원본과 같은 shape이지만 완전히 동일하지 않다. PCA가 보존하지 못한 분산(5%)만큼 정보 손실이 있다."}
+      ]
+    },
+    {
+      "fnName": "PCA 수동 계산 — 공분산·고유값",
+      "badgeCls": "b-purple",
+      "badgeText": "원리",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "PCA의 내부 동작을 numpy만으로 재현해 원리를 파악한다. 핵심 흐름은 ① 평균 제거(중심화) → ② 공분산행렬 계산 → ③ 고유값 분해 → ④ 고유벡터로 투영이다."},
+        {"type": "slbl", "text": "코드 예시 — 수동 PCA vs sklearn"},
+        {"type": "pre", "html": "<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\n<span class=\"cm\"># ① 중심화 (평균 제거)</span>\nX_cen = X - X.<span class=\"fn\">mean</span>(axis=<span class=\"nm\">0</span>)\n\n<span class=\"cm\"># ② 공분산행렬 (3×60 @ 60×3 / (n-1))</span>\nX_cov = np.<span class=\"fn\">dot</span>(X_cen.T, X_cen) / (<span class=\"nm\">60</span> - <span class=\"nm\">1</span>)\n\n<span class=\"cm\"># ③ 고유값 분해</span>\nw, v = np.linalg.<span class=\"fn\">eig</span>(X_cov)  <span class=\"cm\"># w=고유값, v=고유벡터(주성분 축)</span>\nprint(<span class=\"st\">\"설명력:\"</span>, w / w.<span class=\"fn\">sum</span>())   <span class=\"cm\"># [0.84, 0.14, 0.02]</span>\n\n<span class=\"cm\"># ④ sklearn과 비교</span>\npca = <span class=\"fn\">PCA</span>(n_components=<span class=\"nm\">3</span>)\npca.<span class=\"fn\">fit</span>(X_cen)\nprint(pca.singular_values_)   <span class=\"cm\"># SVD의 D값 (= sqrt(고유값 * (n-1)))</span>\nprint(pca.components_.T)      <span class=\"cm\"># 고유벡터와 동일 (부호 차이 가능)</span>"},
+        {"type": "tip", "html": "SVD의 D값은 공분산 고유값 분해의 고유값과 다르다. <code>s² / (n-1) = eigenvalue</code> 관계가 성립한다. <code>pca.explained_variance_</code>가 고유값에 해당한다."}
+      ]
+    }
+  ],
+  "pca_variants": [
+    {
+      "fnName": "IncrementalPCA — 대용량 배치 학습",
+      "badgeCls": "b-blue",
+      "badgeText": "핵심",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "전체 데이터를 한번에 메모리에 올리지 않고 미니배치 단위로 PCA를 학습한다. 메모리보다 큰 데이터셋에 사용하며 <code>partial_fit()</code>으로 배치를 순차 학습한다. <code>np.memmap</code>과 연동하면 디스크 데이터를 직접 처리할 수 있다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>n_components</td><td>int</td><td>추출할 주성분 수 (float 미지원)</td></tr><tr><td>batch_size</td><td>int=None</td><td>None → 5 * n_features 자동 설정</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시 — 배치 학습 & memmap"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.decomposition <span class=\"kw\">import</span> IncrementalPCA\n<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\n<span class=\"cm\"># 방법 1: array_split으로 배치 분할</span>\ninc_pca = <span class=\"fn\">IncrementalPCA</span>(n_components=<span class=\"nm\">154</span>)\n<span class=\"kw\">for</span> X_batch <span class=\"kw\">in</span> np.<span class=\"fn\">array_split</span>(train_x, <span class=\"nm\">100</span>):\n    inc_pca.<span class=\"fn\">partial_fit</span>(X_batch)       <span class=\"cm\"># 배치별 부분 학습</span>\nX_reduced = inc_pca.<span class=\"fn\">transform</span>(train_x)\n\n<span class=\"cm\"># 방법 2: np.memmap으로 디스크 직접 연결</span>\nX_mm = np.<span class=\"fn\">memmap</span>(<span class=\"st\">\"mnist.data\"</span>, dtype=<span class=\"st\">\"float32\"</span>,\n                  mode=<span class=\"st\">\"readonly\"</span>, shape=(m, n))\nbatch_size = m // <span class=\"nm\">100</span>\ninc_pca2 = <span class=\"fn\">IncrementalPCA</span>(n_components=<span class=\"nm\">154</span>, batch_size=batch_size)\ninc_pca2.<span class=\"fn\">fit</span>(X_mm)  <span class=\"cm\"># memmap은 fit()만으로 자동 배치 처리</span>"},
+        {"type": "tip", "html": "memmap 파일은 <code>mode='write'</code>로 저장 후 <code>del</code>로 flush, 이후 <code>mode='readonly'</code>로 다시 열어 사용한다. <code>batch_size</code>를 명시해야 자동 배치가 적용된다."}
+      ]
+    },
+    {
+      "fnName": "KernelPCA — 비선형 차원 축소",
+      "badgeCls": "b-purple",
+      "badgeText": "고급",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "커널 함수로 데이터를 고차원으로 매핑한 뒤 PCA를 적용한다. 실제 고차원 변환 없이 커널 트릭으로 데이터 간 유사도 행렬(커널 행렬)을 계산한다. 비선형 구조가 있는 데이터(스위스롤 등)의 차원 축소에 적합하다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>n_components</td><td>int</td><td>축소 후 차원 수</td></tr><tr><td>kernel</td><td>str=&#39;linear&#39;</td><td>&#39;rbf&#39; | &#39;poly&#39; | &#39;sigmoid&#39; | &#39;cosine&#39; — 비선형엔 rbf·cosine</td></tr><tr><td>gamma</td><td>float=None</td><td>rbf/poly/sigmoid 커널의 스케일 파라미터</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시 — 스위스롤 3D → 2D"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.decomposition <span class=\"kw\">import</span> KernelPCA\n<span class=\"kw\">from</span> sklearn.datasets <span class=\"kw\">import</span> make_swiss_roll\n\nX, t = <span class=\"fn\">make_swiss_roll</span>(n_samples=<span class=\"nm\">1000</span>, noise=<span class=\"nm\">0.2</span>, random_state=<span class=\"nm\">42</span>)\n\nkpca = <span class=\"fn\">KernelPCA</span>(n_components=<span class=\"nm\">2</span>, kernel=<span class=\"st\">\"cosine\"</span>, gamma=<span class=\"nm\">0.04</span>)\nX_reduced = kpca.<span class=\"fn\">fit_transform</span>(X)  <span class=\"cm\"># (1000, 3) → (1000, 2)</span>"},
+        {"type": "warn", "html": "KernelPCA는 커널 행렬(n×n)을 메모리에 올린다. 샘플 수가 크면 메모리 비용이 급증한다. 대용량에는 Nyström 근사 등 대안을 검토하자."}
+      ]
+    },
+    {
+      "fnName": "SparsePCA — L1 규제 성분 추출",
+      "badgeCls": "b-amber",
+      "badgeText": "하이퍼파라미터",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "L1 규제를 적용해 대부분의 성분 가중치를 0으로 만드는 희소 주성분을 찾는다. 해석 가능성이 중요할 때 유용하며, 텍스트 TF-IDF 행렬에서 의미 있는 토픽 단어를 선별하는 데 활용된다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>n_components</td><td>int</td><td>추출할 희소 성분 수</td></tr><tr><td>alpha</td><td>float=1.0</td><td>L1 규제 강도 — 클수록 더 많은 가중치가 0</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시 — TF-IDF 텍스트 토픽 추출"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.decomposition <span class=\"kw\">import</span> SparsePCA\n<span class=\"kw\">from</span> sklearn.feature_extraction.text <span class=\"kw\">import</span> TfidfVectorizer\n<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\ndocuments = [<span class=\"st\">\"Machine learning is powerful.\"</span>,\n             <span class=\"st\">\"AI and deep learning are evolving.\"</span>,\n             <span class=\"st\">\"Data science uses AI and machine learning.\"</span>]\n\nvectorizer = <span class=\"fn\">TfidfVectorizer</span>()\nX_tfidf = vectorizer.<span class=\"fn\">fit_transform</span>(documents).<span class=\"fn\">toarray</span>()\n\nspca = <span class=\"fn\">SparsePCA</span>(n_components=<span class=\"nm\">2</span>, alpha=<span class=\"nm\">0.2</span>, random_state=<span class=\"nm\">42</span>)\nX_spca = spca.<span class=\"fn\">fit_transform</span>(X_tfidf)\n\n<span class=\"cm\"># 각 토픽에서 기여도 상위 단어 추출</span>\nfeature_names = vectorizer.<span class=\"fn\">get_feature_names_out</span>()\n<span class=\"kw\">for</span> i, comp <span class=\"kw\">in</span> <span class=\"fn\">enumerate</span>(spca.components_):\n    top_idx = np.<span class=\"fn\">argsort</span>(np.<span class=\"fn\">abs</span>(comp))[::-<span class=\"nm\">1</span>][:<span class=\"nm\">3</span>]\n    print(<span class=\"st\">f\"Topic {i+1}:\"</span>, [feature_names[j] <span class=\"kw\">for</span> j <span class=\"kw\">in</span> top_idx])"},
+        {"type": "tip", "html": "SparsePCA는 TruncatedSVD와 달리 밀집 행렬을 입력으로 받는다. TF-IDF 행렬은 <code>.toarray()</code>로 변환 후 입력해야 한다."}
+      ]
+    }
+  ],
+  "manifold": [
+    {
+      "fnName": "MDS — 다차원 척도법",
+      "badgeCls": "b-blue",
+      "badgeText": "핵심",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "데이터 포인트 간 거리(비유사도)를 최대한 보존하면서 저차원에 배치한다. 원본 특징 행렬 또는 사전 계산된 거리 행렬을 입력으로 받을 수 있다. 회전·반사 변환에는 불변이지만 비선형 구조에는 취약하다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>n_components</td><td>int=2</td><td>축소 후 차원 수</td></tr><tr><td>dissimilarity</td><td>str=&#39;euclidean&#39;</td><td>&#39;precomputed&#39; → 거리 행렬 직접 입력</td></tr><tr><td>random_state</td><td>int=None</td><td>초기 배치 재현성</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시 — 거리 행렬로 복원"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.manifold <span class=\"kw\">import</span> MDS\n<span class=\"kw\">from</span> sklearn.metrics <span class=\"kw\">import</span> pairwise_distances\n\n<span class=\"cm\"># 사전 계산된 거리 행렬 사용</span>\nD = <span class=\"fn\">pairwise_distances</span>(X)          <span class=\"cm\"># (1000, 1000)</span>\nmodel = <span class=\"fn\">MDS</span>(n_components=<span class=\"nm\">2</span>,\n             dissimilarity=<span class=\"st\">\"precomputed\"</span>,\n             random_state=<span class=\"nm\">1</span>)\nout = model.<span class=\"fn\">fit_transform</span>(D)       <span class=\"cm\"># 거리 보존하며 2D 배치</span>"},
+        {"type": "warn", "html": "MDS는 비선형 변환(S-커브 등)에 취약하다. 거리를 유지하려 하지만 구부러진 매니폴드 구조를 펼치지 못한다. 비선형 데이터에는 LLE 또는 Isomap을 사용하자."}
+      ]
+    },
+    {
+      "fnName": "LocallyLinearEmbedding (LLE)",
+      "badgeCls": "b-teal",
+      "badgeText": "변환",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "각 포인트를 가장 가까운 이웃들의 선형 조합으로 표현하는 가중치를 구한 뒤, 저차원에서도 그 가중치 관계가 유지되도록 투영한다. 그래프 기반의 국소 관계를 중시하며 비선형 매니폴드 펼치기에 강하다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>n_neighbors</td><td>int</td><td>이웃 수 — 클수록 전역 구조 반영, 작을수록 국소</td></tr><tr><td>n_components</td><td>int</td><td>축소 후 차원 수</td></tr><tr><td>method</td><td>str=&#39;standard&#39;</td><td>&#39;modified&#39; | &#39;hessian&#39; | &#39;ltsa&#39; — modified가 노이즈에 강함</td></tr><tr><td>eigen_solver</td><td>str=&#39;auto&#39;</td><td>&#39;dense&#39; — 소규모 데이터에 안정적</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.manifold <span class=\"kw\">import</span> LocallyLinearEmbedding\n\nmodel = <span class=\"fn\">LocallyLinearEmbedding</span>(\n    n_neighbors=<span class=\"nm\">100</span>,\n    n_components=<span class=\"nm\">2</span>,\n    method=<span class=\"st\">\"modified\"</span>,\n    eigen_solver=<span class=\"st\">\"dense\"</span>\n)\nout = model.<span class=\"fn\">fit_transform</span>(XS)  <span class=\"cm\"># S-커브 3D → 2D 펼치기</span>"},
+        {"type": "tip", "html": "국소 관계에 강하지만 전역적 관계는 약하다. 데이터 전체 분포를 보려면 Isomap 또는 UMAP을 고려하자."}
+      ]
+    },
+    {
+      "fnName": "Isomap — 측지거리 기반",
+      "badgeCls": "b-teal",
+      "badgeText": "변환",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "이웃 그래프를 구축한 뒤 유클리드 거리 대신 그래프 최단 경로(측지거리)를 보존하며 차원을 축소한다. LLE보다 전역 구조 보존에 강하지만 국소 왜곡이 발생할 수 있다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>n_components</td><td>int=2</td><td>축소 후 차원 수</td></tr><tr><td>n_neighbors</td><td>int=5</td><td>이웃 수 — 클수록 전역 구조 강조</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.manifold <span class=\"kw\">import</span> Isomap\n\niso = <span class=\"fn\">Isomap</span>(n_components=<span class=\"nm\">2</span>, n_neighbors=<span class=\"nm\">15</span>)\nX_iso = iso.<span class=\"fn\">fit_transform</span>(X3)  <span class=\"cm\"># 3D HELLO → 2D</span>"}
+      ]
+    },
+    {
+      "fnName": "UMAP — 균형 매니폴드 학습",
+      "badgeCls": "b-purple",
+      "badgeText": "고급",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "리만 기하학과 위상수학을 기반으로 국소·전역 구조를 균형 있게 보존하며 비선형 차원 축소를 수행한다. sklearn 외부 라이브러리(<code>umap-learn</code>)이며 t-SNE보다 빠르고 대용량 데이터에 실용적이다."},
+        {"type": "slbl", "text": "설치"},
+        {"type": "pre", "html": "pip install umap-learn"},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>n_components</td><td>int=2</td><td>축소 후 차원 수</td></tr><tr><td>n_neighbors</td><td>int=15</td><td>국소 구조 크기 — 클수록 전역 구조 강조</td></tr><tr><td>min_dist</td><td>float=0.1</td><td>저차원에서 포인트 간 최소 거리 — 클수록 분산</td></tr><tr><td>random_state</td><td>int=None</td><td>재현성 고정</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">import</span> umap\n\numap_model = umap.<span class=\"fn\">UMAP</span>(\n    n_components=<span class=\"nm\">2</span>,\n    n_neighbors=<span class=\"nm\">100</span>,\n    min_dist=<span class=\"nm\">0.3</span>,\n    random_state=<span class=\"nm\">42</span>\n)\nX_umap = umap_model.<span class=\"fn\">fit_transform</span>(X3)"},
+        {"type": "slbl", "text": "알고리즘 비교"},
+        {"type": "table", "html": "<table class=\"cmp-table\"><tr><th>알고리즘</th><th>국소 구조</th><th>전역 구조</th><th>비선형</th><th>속도</th></tr><tr><td>MDS</td><td>△</td><td>○</td><td>✕</td><td>느림</td></tr><tr><td>LLE</td><td>○</td><td>△</td><td>○</td><td>중간</td></tr><tr><td>Isomap</td><td>△</td><td>○</td><td>○</td><td>중간</td></tr><tr><td>UMAP</td><td>○</td><td>○</td><td>○</td><td>빠름</td></tr></table>"},
+        {"type": "tip", "html": "<code>n_neighbors</code>를 크게 하면 전역 구조가, 작게 하면 국소 클러스터가 강조된다. <code>min_dist=0</code>에 가까울수록 클러스터가 조밀하게 뭉친다."}
+      ]
+    }
+  ]
+}

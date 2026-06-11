@@ -201,6 +201,19 @@ export const LIBRARIES: Library[] = [
       { id: "dbscan", label: "DBSCAN" },
     ],
   },
+  {
+    slug: "dim_reduction",
+    title: "Dimensionality Reduction",
+    description: "SVD · PCA · IncrementalPCA · KernelPCA · UMAP · Manifold",
+    icon: "⊕",
+    color: "#7c3aed",
+    sections: [
+      { id: "svd", label: "SVD" },
+      { id: "pca_core", label: "PCA 핵심" },
+      { id: "pca_variants", label: "PCA 변형" },
+      { id: "manifold", label: "매니폴드" },
+    ],
+  },
 ];
 
 export function getLibrary(slug: string): Library | undefined {
