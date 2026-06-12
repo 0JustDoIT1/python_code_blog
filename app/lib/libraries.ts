@@ -214,6 +214,21 @@ export const LIBRARIES: Library[] = [
       { id: "manifold", label: "매니폴드" },
     ],
   },
+  {
+    slug: "svm",
+    title: "SVM",
+    description: "SVC · 커널 함수 · NuSVC · Platt Scaling · 이상탐지",
+    icon: "⊕",
+    color: "#7c3aed",
+    sections: [
+      { id: "svc_basics", label: "SVC 기초" },
+      { id: "kernel_types", label: "커널 함수" },
+      { id: "nusvc_params", label: "NuSVC 파라미터" },
+      { id: "multiclass", label: "다중분류" },
+      { id: "platt_scaling", label: "Platt Scaling" },
+      { id: "oneclass_svm", label: "이상탐지" },
+    ],
+  },
 ];
 
 export function getLibrary(slug: string): Library | undefined {

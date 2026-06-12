@@ -1,0 +1,149 @@
+{
+  "svc_basics": [
+    {
+      "fnName": "SVC()",
+      "badgeCls": "b-blue",
+      "badgeText": "핵심 API",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "Support Vector Classifier. 데이터를 고차원으로 매핑한 뒤 클래스 간 마진(margin)이 최대가 되는 초평면을 찾아 분류한다. <code>kernel</code>로 선형/비선형 경계를 모두 표현할 수 있다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\">\n<tr><td>kernel</td><td>str='rbf'</td><td>'linear' · 'rbf' · 'poly' · 'sigmoid' · 'precomputed'</td></tr>\n<tr><td>C</td><td>float=1.0</td><td>규제 강도 — 클수록 하드 마진(과대적합 위험)</td></tr>\n<tr><td>probability</td><td>bool=False</td><td>True 시 Platt Scaling으로 확률 출력 가능</td></tr>\n<tr><td>random_state</td><td>int=None</td><td>probability=True일 때 재현성 확보</td></tr>\n</table>"},
+        {"type": "slbl", "text": "주요 속성"},
+        {"type": "table", "html": "<table class=\"pt\">\n<tr><td>coef_</td><td>ndarray</td><td>linear 커널 전용 가중치 벡터 (초평면 법선)</td></tr>\n<tr><td>intercept_</td><td>ndarray</td><td>바이어스(절편) b</td></tr>\n<tr><td>support_vectors_</td><td>ndarray</td><td>서포트 벡터 좌표</td></tr>\n<tr><td>support_</td><td>ndarray</td><td>서포트 벡터의 훈련 데이터 인덱스</td></tr>\n</table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.svm <span class=\"kw\">import</span> SVC\n<span class=\"kw\">from</span> sklearn.preprocessing <span class=\"kw\">import</span> StandardScaler\n\nscaler = StandardScaler()\nX_scaled = scaler.<span class=\"fn\">fit_transform</span>(X_train)\n\nmodel = <span class=\"fn\">SVC</span>(kernel=<span class=\"st\">\"linear\"</span>, C=<span class=\"nm\">1.0</span>)\nmodel.<span class=\"fn\">fit</span>(X_scaled, y_train)\n\nw = model.coef_[<span class=\"nm\">0</span>]           <span class=\"cm\"># 초평면 법선 벡터</span>\nb = model.intercept_[<span class=\"nm\">0</span>]      <span class=\"cm\"># 바이어스</span>\nmargin = <span class=\"nm\">2</span> / np.<span class=\"fn\">linalg.norm</span>(w)  <span class=\"cm\"># 전체 마진 폭</span>"},
+        {"type": "tip", "html": "SVM은 피처 스케일에 민감하다. <code>StandardScaler</code>로 정규화한 뒤 학습하는 것이 필수다."}
+      ]
+    },
+    {
+      "fnName": "decision_function()",
+      "badgeCls": "b-purple",
+      "badgeText": "모델 속성",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "각 샘플에서 초평면까지의 부호 있는 거리를 반환한다. 양수면 양성 클래스, 음수면 음성 클래스 방향이며 절댓값이 클수록 초평면에서 멀다. 이진분류에서 <code>np.sign()</code>을 취하면 예측 레이블이 된다."},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "f_values = model.<span class=\"fn\">decision_function</span>(X_test)\n<span class=\"cm\"># 양수 → 클래스 1, 음수 → 클래스 -1</span>\n\npredictions = np.<span class=\"fn\">sign</span>(f_values)\n\n<span class=\"cm\"># contour 시각화용</span>\nxx, yy = np.<span class=\"fn\">meshgrid</span>(np.<span class=\"fn\">linspace</span>(-<span class=\"nm\">2</span>, <span class=\"nm\">2</span>, <span class=\"nm\">100</span>),\n                      np.<span class=\"fn\">linspace</span>(-<span class=\"nm\">2</span>, <span class=\"nm\">2</span>, <span class=\"nm\">100</span>))\nZ = model.<span class=\"fn\">decision_function</span>(np.c_[xx.<span class=\"fn\">ravel</span>(), yy.<span class=\"fn\">ravel</span>()])\nZ = Z.<span class=\"fn\">reshape</span>(xx.shape)"},
+        {"type": "tip", "html": "값이 -1 ~ +1 사이이면 마진 경계 안쪽(서포트 벡터 근처), 0이면 정확히 초평면 위에 있다."}
+      ]
+    },
+    {
+      "fnName": "Perceptron (개념)",
+      "badgeCls": "b-gray",
+      "badgeText": "배경 개념",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "단층 퍼셉트론은 SVM의 전신으로, 오분류된 샘플이 없을 때까지 가중치를 반복 갱신한다. 선형 분리 불가능한 데이터(XOR 등)를 처리하지 못하는 한계가 있으며, SVM은 이를 커널 트릭으로 해결한다."},
+        {"type": "slbl", "text": "업데이트 규칙"},
+        {"type": "pre", "html": "<span class=\"cm\"># 오분류 시: w ← w + lr * y_i * x_i</span>\n<span class=\"cm\">#            b ← b + lr * y_i * R²</span>\n\n<span class=\"kw\">def</span> <span class=\"fn\">perceptron</span>(X, Y, learning_rate=<span class=\"nm\">1</span>):\n    w = np.<span class=\"fn\">zeros</span>(X.shape[<span class=\"nm\">1</span>])\n    b = <span class=\"nm\">0</span>\n    R = np.<span class=\"fn\">max</span>(np.<span class=\"fn\">linalg.norm</span>(X, axis=<span class=\"nm\">1</span>))\n    incorrect = <span class=\"kw\">True</span>\n    <span class=\"kw\">while</span> incorrect:\n        incorrect = <span class=\"kw\">False</span>\n        <span class=\"kw\">for</span> i <span class=\"kw\">in</span> <span class=\"fn\">range</span>(<span class=\"fn\">len</span>(X)):\n            <span class=\"kw\">if</span> Y[i] != np.<span class=\"fn\">sign</span>(np.<span class=\"fn\">dot</span>(X[i], w) + b):\n                w += learning_rate * Y[i] * X[i]\n                b += learning_rate * Y[i] * R**<span class=\"nm\">2</span>\n                incorrect = <span class=\"kw\">True</span>\n    <span class=\"kw\">return</span> w, b"},
+        {"type": "warn", "html": "종속변수는 반드시 <code>-1 / +1</code>로 인코딩해야 업데이트 규칙이 올바르게 작동한다."}
+      ]
+    }
+  ],
+  "kernel_types": [
+    {
+      "fnName": "kernel 종류 비교",
+      "badgeCls": "b-blue",
+      "badgeText": "핵심 개념",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "커널 함수는 데이터를 고차원으로 명시적 변환 없이 내적 계산만으로 고차원 특성을 반영하는 트릭이다. 데이터 형태에 따라 커널을 선택하면 분류 성능이 크게 달라진다."},
+        {"type": "table", "html": "<table class=\"cmp-table\">\n<tr><th>커널</th><th>수식 특징</th><th>적합한 데이터</th></tr>\n<tr><td>linear</td><td>단순 내적</td><td>고차원·텍스트, 선형 분리 가능</td></tr>\n<tr><td>rbf</td><td>가우시안 (기본값)</td><td>일반적 비선형, 범용</td></tr>\n<tr><td>poly</td><td>다항식</td><td>이미지, 구조적 패턴</td></tr>\n<tr><td>sigmoid</td><td>tanh 기반</td><td>신경망 유사 경계</td></tr>\n<tr><td>precomputed</td><td>사전 계산 행렬</td><td>커스텀 커널</td></tr>\n</table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"cm\"># rbf 커널 (기본)</span>\nmodel = <span class=\"fn\">SVC</span>(kernel=<span class=\"st\">\"rbf\"</span>, C=<span class=\"nm\">1.0</span>, gamma=<span class=\"st\">\"scale\"</span>)\n\n<span class=\"cm\"># poly 커널</span>\nmodel = <span class=\"fn\">SVC</span>(kernel=<span class=\"st\">\"poly\"</span>, degree=<span class=\"nm\">3</span>, C=<span class=\"nm\">1.0</span>)\n\n<span class=\"cm\"># XOR 같은 비선형 → rbf</span>\nX = np.<span class=\"fn\">array</span>([[<span class=\"nm\">0</span>,<span class=\"nm\">0</span>],[<span class=\"nm\">0</span>,<span class=\"nm\">1</span>],[<span class=\"nm\">1</span>,<span class=\"nm\">0</span>],[<span class=\"nm\">1</span>,<span class=\"nm\">1</span>]])\ny = np.<span class=\"fn\">array</span>([<span class=\"nm\">0</span>, <span class=\"nm\">1</span>, <span class=\"nm\">1</span>, <span class=\"nm\">0</span>])\nsvm = <span class=\"fn\">SVC</span>(kernel=<span class=\"st\">\"rbf\"</span>)\nsvm.<span class=\"fn\">fit</span>(X, y)"}
+      ]
+    },
+    {
+      "fnName": "precomputed kernel",
+      "badgeCls": "b-purple",
+      "badgeText": "고급 기능",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "커널 행렬을 직접 계산해 전달하는 방식. Laplacian, 카이제곱 등 scikit-learn에 내장되지 않은 커널을 적용할 때 사용한다. <code>fit()</code>에 train×train 행렬, <code>predict()</code>에 test×train 행렬을 넘겨야 한다."},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.metrics.pairwise <span class=\"kw\">import</span> laplacian_kernel\n\n<span class=\"cm\"># 커널 행렬 사전 계산</span>\nK_train = <span class=\"fn\">laplacian_kernel</span>(X_train, X_train, gamma=<span class=\"nm\">0.5</span>)\nK_test  = <span class=\"fn\">laplacian_kernel</span>(X_test,  X_train, gamma=<span class=\"nm\">0.5</span>)\n\nmodel = <span class=\"fn\">SVC</span>(kernel=<span class=\"st\">\"precomputed\"</span>)\nmodel.<span class=\"fn\">fit</span>(K_train, y_train)\nacc = model.<span class=\"fn\">score</span>(K_test, y_test)\n\n<span class=\"cm\"># 커스텀 다항 커널</span>\n<span class=\"kw\">def</span> <span class=\"fn\">custom_poly</span>(X1, X2, gamma=<span class=\"nm\">1.0</span>, c=<span class=\"nm\">1.0</span>, d=<span class=\"nm\">3</span>):\n    <span class=\"kw\">return</span> (gamma * np.<span class=\"fn\">dot</span>(X1, X2.T) + c) ** d"},
+        {"type": "warn", "html": "test 행렬은 반드시 <code>laplacian_kernel(X_test, X_train)</code> 순서여야 한다. train×train이 아님에 주의."}
+      ]
+    },
+    {
+      "fnName": "Hinge Loss",
+      "badgeCls": "b-amber",
+      "badgeText": "손실 함수",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "SVC의 손실 함수. 예측이 마진 경계(f(x)=1) 안쪽에 있을 때만 벌점을 부과한다. 수식: <code>max(0, 1 - y·f(x))</code>. f(x) ≥ 1이면 손실 0, 결정 경계(f=0) 근처일수록 손실이 커진다."},
+        {"type": "slbl", "text": "시각화"},
+        {"type": "pre", "html": "fx = np.<span class=\"fn\">linspace</span>(-<span class=\"nm\">2</span>, <span class=\"nm\">2</span>, <span class=\"nm\">100</span>)\nhinge = np.<span class=\"fn\">maximum</span>(<span class=\"nm\">0</span>, <span class=\"nm\">1</span> - fx)  <span class=\"cm\"># Hinge Loss</span>\n\nplt.<span class=\"fn\">plot</span>(fx, hinge, color=<span class=\"st\">\"red\"</span>)\nplt.<span class=\"fn\">axvline</span>(x=<span class=\"nm\">1</span>, linestyle=<span class=\"st\">\"--\"</span>)   <span class=\"cm\"># 마진 경계</span>\nplt.<span class=\"fn\">axvline</span>(x=<span class=\"nm\">0</span>, linestyle=<span class=\"st\">\"--\"</span>)   <span class=\"cm\"># 결정 경계</span>"},
+        {"type": "tip", "html": "SVR(회귀)에서는 Epsilon-Insensitive Loss를 사용한다. 예측값이 ε 튜브 안에 있으면 손실 0."}
+      ]
+    }
+  ],
+  "nusvc_params": [
+    {
+      "fnName": "NuSVC()",
+      "badgeCls": "b-blue",
+      "badgeText": "핵심 API",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "<code>SVC</code>의 대안 구현. <code>C</code> 대신 <code>nu</code>로 이상치 허용 비율과 서포트 벡터 비율을 직관적으로 제어한다. 훈련 데이터 중 이상치(오분류)의 상한, 서포트 벡터 비율의 하한을 동시에 지정한다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\">\n<tr><td>nu</td><td>float=(0,1]</td><td>이상치 허용 비율 상한 + 서포트 벡터 비율 하한. 클수록 일반화, 작을수록 과대적합</td></tr>\n<tr><td>kernel</td><td>str='rbf'</td><td>SVC와 동일</td></tr>\n<tr><td>gamma</td><td>str·float='scale'</td><td>rbf/poly/sigmoid 커널의 영향 반경. 클수록 과대적합</td></tr>\n</table>"},
+        {"type": "slbl", "text": "nu / gamma 조합 효과"},
+        {"type": "table", "html": "<table class=\"cmp-table\">\n<tr><th>파라미터</th><th>작은 값</th><th>큰 값</th></tr>\n<tr><td>nu</td><td>하드 마진 → 과대적합</td><td>소프트 마진 → 일반화</td></tr>\n<tr><td>gamma</td><td>넓은 영향 범위 → 일반화</td><td>좁은 영향 범위 → 과대적합</td></tr>\n</table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.svm <span class=\"kw\">import</span> NuSVC\n<span class=\"kw\">from</span> sklearn.datasets <span class=\"kw\">import</span> make_moons\n\nX, y = <span class=\"fn\">make_moons</span>(n_samples=<span class=\"nm\">200</span>, noise=<span class=\"nm\">0.2</span>, random_state=<span class=\"nm\">42</span>)\n\nmodel = <span class=\"fn\">NuSVC</span>(kernel=<span class=\"st\">\"rbf\"</span>, gamma=<span class=\"nm\">1.0</span>, nu=<span class=\"nm\">0.1</span>)\nmodel.<span class=\"fn\">fit</span>(X_train, y_train)\nprint(model.<span class=\"fn\">score</span>(X_test, y_test))"},
+        {"type": "tip", "html": "<code>nu</code>가 출현한 이유: <code>C</code>와 <code>gamma</code>는 마진·커널을 간접 제어해 직관성이 낮다. <code>nu</code>는 이상치 비율을 직접 지정할 수 있어 해석이 쉽다."}
+      ]
+    }
+  ],
+  "multiclass": [
+    {
+      "fnName": "OvO / OvR 다중분류",
+      "badgeCls": "b-blue",
+      "badgeText": "핵심 개념",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "SVC는 본질적으로 이진 분류기다. 클래스가 3개 이상이면 내부적으로 OvO(One-vs-One) 전략을 자동 적용한다. <code>OneVsRestClassifier</code>로 OvR을 명시적으로 사용할 수도 있다."},
+        {"type": "table", "html": "<table class=\"cmp-table\">\n<tr><th>전략</th><th>분류기 수</th><th>특징</th></tr>\n<tr><td>OvO (기본)</td><td>k(k-1)/2</td><td>SVC 기본값, 클래스 쌍마다 학습</td></tr>\n<tr><td>OvR</td><td>k</td><td>각 클래스 vs 나머지, LinearSVC에 적합</td></tr>\n</table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.svm <span class=\"kw\">import</span> SVC, LinearSVC\n<span class=\"kw\">from</span> sklearn.multiclass <span class=\"kw\">import</span> OneVsRestClassifier\n\n<span class=\"cm\"># OvO — SVC 기본 (자동 적용)</span>\nmodel = <span class=\"fn\">SVC</span>(kernel=<span class=\"st\">\"linear\"</span>, C=<span class=\"nm\">1.0</span>)\nmodel.<span class=\"fn\">fit</span>(X_train, y_train)  <span class=\"cm\"># 3클래스 → 3개 이진 분류기</span>\n\n<span class=\"cm\"># OvR — 명시적 지정</span>\novr = <span class=\"fn\">OneVsRestClassifier</span>(<span class=\"fn\">LinearSVC</span>())\novr.<span class=\"fn\">fit</span>(X_train, y_train)\nprint(<span class=\"fn\">accuracy_score</span>(y_test, ovr.<span class=\"fn\">predict</span>(X_test)))"},
+        {"type": "tip", "html": "<code>LinearSVC</code>는 <code>SVC(kernel='linear')</code>보다 대규모 데이터에 빠르다. 다만 <code>decision_function()</code> 형태가 다르므로 확률 출력이 필요하면 <code>SVC(probability=True)</code>를 사용한다."}
+      ]
+    }
+  ],
+  "platt_scaling": [
+    {
+      "fnName": "Platt Scaling",
+      "badgeCls": "b-teal",
+      "badgeText": "캘리브레이션",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "SVM의 <code>decision_function()</code>이 반환하는 거리값은 확률이 아니다. Platt Scaling은 로지스틱 회귀를 사용해 거리값을 0~1 확률로 변환하는 캘리브레이션 기법이다. 수식: <code>P(y=1|x) = 1 / (1 + exp(A·f(x) + B))</code>"},
+        {"type": "slbl", "text": "구현 절차"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.linear_model <span class=\"kw\">import</span> LogisticRegression\n\n<span class=\"cm\"># 1. SVM 거리값 추출 (캘리브레이션용 홀드아웃 세트)</span>\nsvm_scores = svm_model.<span class=\"fn\">decision_function</span>(X_calib)\n\n<span class=\"cm\"># 2. 레이블 0/1 변환 (-1/1 → 0/1)</span>\ny_calib_01 = np.<span class=\"fn\">where</span>(y_calib == <span class=\"nm\">1</span>, <span class=\"nm\">1</span>, <span class=\"nm\">0</span>)\n\n<span class=\"cm\"># 3. 로지스틱 회귀로 A, B 학습</span>\nplatt = <span class=\"fn\">LogisticRegression</span>()\nplatt.<span class=\"fn\">fit</span>(svm_scores.<span class=\"fn\">reshape</span>(-<span class=\"nm\">1</span>, <span class=\"nm\">1</span>), y_calib_01)\nA = platt.coef_[<span class=\"nm\">0</span>][<span class=\"nm\">0</span>]\nB = platt.intercept_[<span class=\"nm\">0</span>]\n\n<span class=\"cm\"># 4. 확률 변환</span>\n<span class=\"kw\">def</span> <span class=\"fn\">platt_proba</span>(scores, A, B):\n    <span class=\"kw\">return</span> <span class=\"nm\">1</span> / (<span class=\"nm\">1</span> + np.<span class=\"fn\">exp</span>(A * scores + B))"},
+        {"type": "tip", "html": "scikit-learn에서는 <code>SVC(probability=True)</code>로 내부적으로 Platt Scaling을 자동 적용할 수 있다. 단, 학습 시간이 늘어나고 교차검증을 내부 수행하므로 소규모 데이터에서 결과가 불안정할 수 있다."},
+        {"type": "warn", "html": "캘리브레이션은 훈련 데이터가 아닌 <strong>별도 홀드아웃 세트</strong>로 수행해야 한다. 훈련 데이터로 하면 과적합된 확률이 나온다."}
+      ]
+    }
+  ],
+  "oneclass_svm": [
+    {
+      "fnName": "OneClassSVM()",
+      "badgeCls": "b-coral",
+      "badgeText": "이상탐지",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "정상 데이터만으로 학습해 경계를 정의하고, 경계 밖 샘플을 이상치(anomaly)로 탐지하는 비지도 모델이다. 예측값 <code>+1</code>은 정상, <code>-1</code>은 이상치를 의미한다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\">\n<tr><td>nu</td><td>float=(0,1]</td><td>이상치 허용 비율 상한 — 작을수록 타이트한 경계</td></tr>\n<tr><td>kernel</td><td>str='rbf'</td><td>경계 형태 결정</td></tr>\n<tr><td>gamma</td><td>str·float='scale'</td><td>작을수록 넓은 경계 → 일반화</td></tr>\n</table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.svm <span class=\"kw\">import</span> OneClassSVM\n\n<span class=\"cm\"># 정상 데이터로만 학습</span>\nclf = <span class=\"fn\">OneClassSVM</span>(nu=<span class=\"nm\">0.01</span>, kernel=<span class=\"st\">\"rbf\"</span>, gamma=<span class=\"nm\">0.005</span>)\nclf.<span class=\"fn\">fit</span>(X_train)  <span class=\"cm\"># 레이블 없이 X만 입력</span>\n\ny_pred = clf.<span class=\"fn\">predict</span>(X_test)\n<span class=\"cm\"># +1 → 정상, -1 → 이상치</span>\n\nn_anomaly = (y_pred == -<span class=\"nm\">1</span>).<span class=\"fn\">sum</span>()\nprint(<span class=\"fn\">f\"이상치 탐지 수: {n_anomaly}\"</span>)"},
+        {"type": "slbl", "text": "하이퍼파라미터 탐색"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.model_selection <span class=\"kw\">import</span> ParameterGrid\n<span class=\"kw\">from</span> sklearn.metrics <span class=\"kw\">import</span> f1_score\n\nparam_grid = {\n    <span class=\"st\">\"nu\"</span>:     [<span class=\"nm\">0.01</span>, <span class=\"nm\">0.05</span>, <span class=\"nm\">0.1</span>, <span class=\"nm\">0.2</span>],\n    <span class=\"st\">\"gamma\"</span>:  [<span class=\"nm\">0.01</span>, <span class=\"nm\">0.05</span>, <span class=\"nm\">0.5</span>, <span class=\"nm\">1</span>],\n    <span class=\"st\">\"kernel\"</span>: [<span class=\"st\">\"rbf\"</span>, <span class=\"st\">\"poly\"</span>, <span class=\"st\">\"sigmoid\"</span>]\n}\nbest_f1, best_params = -<span class=\"nm\">1</span>, <span class=\"kw\">None</span>\n<span class=\"kw\">for</span> params <span class=\"kw\">in</span> <span class=\"fn\">ParameterGrid</span>(param_grid):\n    model = <span class=\"fn\">OneClassSVM</span>(**params)\n    model.<span class=\"fn\">fit</span>(X_train)\n    y_true = np.<span class=\"fn\">hstack</span>([np.<span class=\"fn\">ones</span>(<span class=\"fn\">len</span>(X_train)), -np.<span class=\"fn\">ones</span>(<span class=\"fn\">len</span>(X_outliers))])\n    y_pred = np.<span class=\"fn\">hstack</span>([model.<span class=\"fn\">predict</span>(X_train), model.<span class=\"fn\">predict</span>(X_outliers)])\n    f1 = <span class=\"fn\">f1_score</span>(y_true, y_pred, pos_label=-<span class=\"nm\">1</span>)\n    <span class=\"kw\">if</span> f1 > best_f1:\n        best_f1, best_params = f1, params"},
+        {"type": "tip", "html": "훈련 데이터에 오분류가 나오는 건 정상이다. <code>nu=0.01</code>이면 훈련 샘플의 1%까지 이상치로 허용한다."},
+        {"type": "warn", "html": "GridSearchCV는 레이블이 있는 지도학습용이라 OneClassSVM에 직접 사용할 수 없다. <code>ParameterGrid</code>로 수동 탐색하거나 <code>f1_score(pos_label=-1)</code>로 이상치 기준 평가한다."}
+      ]
+    }
+  ]
+}
