@@ -1,0 +1,180 @@
+{
+  "encoding": [
+    {
+      "fnName": "One-Hot Encoding (수동)",
+      "badgeCls": "b-blue",
+      "badgeText": "Encoding",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "단어를 고유 인덱스 위치만 1이고 나머지는 0인 벡터로 표현. 어휘 사전을 직접 구성한 뒤 <code>np.zeros()</code>로 벡터를 만들고 해당 인덱스를 1로 설정한다."},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\nsentences = [<span class=\"st\">\"인공지능 모델 개발\"</span>, <span class=\"st\">\"딥러닝 모델 학습\"</span>]\nword_set = <span class=\"fn\">set</span>()\n<span class=\"kw\">for</span> sentence <span class=\"kw\">in</span> sentences:\n    <span class=\"kw\">for</span> word <span class=\"kw\">in</span> sentence.<span class=\"fn\">split</span>():\n        word_set.<span class=\"fn\">add</span>(word)\n\nword_to_index = {word: idx <span class=\"kw\">for</span> idx, word <span class=\"kw\">in</span> <span class=\"fn\">enumerate</span>(<span class=\"fn\">sorted</span>(word_set))}\nVOCAB_SIZE = <span class=\"fn\">len</span>(word_to_index)\n\n<span class=\"cm\"># 벡터 생성</span>\none_hot = np.<span class=\"fn\">zeros</span>(VOCAB_SIZE)\none_hot[word_to_index[<span class=\"st\">\"모델\"</span>]] = <span class=\"nm\">1.0</span>\n<span class=\"cm\"># [0. 0. 1. 0. 0.]  ← 어휘 크기만큼의 희소 벡터</span>"},
+        {"type": "warn", "html": "어휘 크기가 커질수록 벡터 차원도 선형 증가 — 대규모 말뭉치에는 <code>CountVectorizer</code>나 임베딩 사용 권장."}
+      ]
+    },
+    {
+      "fnName": "CountVectorizer · TfidfTransformer",
+      "badgeCls": "b-teal",
+      "badgeText": "sklearn",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "<code>CountVectorizer</code>는 문서 집합을 자동으로 토크나이징해 단어-문서 빈도 행렬(DTM)을 생성한다. <code>TfidfTransformer</code>는 DTM을 입력받아 TF-IDF 가중치로 변환하며, 자주 등장하지만 중요도가 낮은 단어의 영향을 줄인다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>CountVectorizer()</td><td></td><td>토크나이징 + 어휘 구축 + DTM 생성</td></tr><tr><td>fit_transform(docs)</td><td>list[str]</td><td>어휘 학습 및 희소 행렬 반환</td></tr><tr><td>get_feature_names_out()</td><td></td><td>정렬된 단어 목록 반환</td></tr><tr><td>TfidfTransformer()</td><td></td><td>count → TF-IDF 변환</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> sklearn.feature_extraction.text <span class=\"kw\">import</span> CountVectorizer, TfidfTransformer\n\nsentences = [<span class=\"st\">\"인공지능 모델 개발\"</span>, <span class=\"st\">\"딥러닝 모델 학습\"</span>]\n\nvectorizer = <span class=\"fn\">CountVectorizer</span>()\ncount_matrix = vectorizer.<span class=\"fn\">fit_transform</span>(sentences)\nprint(vectorizer.<span class=\"fn\">get_feature_names_out</span>())  <span class=\"cm\"># ['개발' '딥러닝' '모델' '인공지능' '학습']</span>\nprint(count_matrix.<span class=\"fn\">toarray</span>())\n<span class=\"cm\"># [[1 0 1 1 0]\n#  [0 1 1 0 1]]</span>\n\ntfidf = <span class=\"fn\">TfidfTransformer</span>()\ntfidf_matrix = tfidf.<span class=\"fn\">fit_transform</span>(count_matrix)\nprint(tfidf_matrix.<span class=\"fn\">toarray</span>().round(<span class=\"nm\">4</span>))\n<span class=\"cm\"># '모델'은 두 문서 모두 등장 → IDF 낮아 가중치 감소</span>"},
+        {"type": "tip", "html": "두 단계를 합친 <code>TfidfVectorizer</code>를 사용하면 한 번에 처리 가능."}
+      ]
+    }
+  ],
+  "nltk_basic": [
+    {
+      "fnName": "sent_tokenize · word_tokenize",
+      "badgeCls": "b-blue",
+      "badgeText": "NLTK",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "NLTK의 기본 토크나이저. <code>sent_tokenize</code>는 문단을 문장 단위로 분리하고, <code>word_tokenize</code>는 문장을 단어/구두점으로 분리한다. 한국어 문장도 어느 정도 처리 가능하나 영어에 최적화되어 있다."},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">import</span> nltk\nnltk.<span class=\"fn\">download</span>(<span class=\"st\">'punkt_tab'</span>)\n\n<span class=\"kw\">from</span> nltk.tokenize <span class=\"kw\">import</span> sent_tokenize, word_tokenize\n\npara = <span class=\"st\">\"Hello everyone. Nice to meet you.\"</span>\nprint(<span class=\"fn\">sent_tokenize</span>(para))\n<span class=\"cm\"># ['Hello everyone.', 'Nice to meet you.']</span>\n\nprint(<span class=\"fn\">word_tokenize</span>(para))\n<span class=\"cm\"># ['Hello', 'everyone', '.', 'Nice', 'to', 'meet', 'you', '.']</span>\n\n<span class=\"cm\"># 정규표현식 기반 토크나이저</span>\n<span class=\"kw\">from</span> nltk.tokenize <span class=\"kw\">import</span> RegexpTokenizer\ntokenizer = <span class=\"fn\">RegexpTokenizer</span>(<span class=\"st\">[\"\\w']+\"</span>)  <span class=\"cm\"># 구두점 제외</span>\ntokenizer.<span class=\"fn\">tokenize</span>(<span class=\"st\">\"Can't is a contraction.\"</span>)\n<span class=\"cm\"># [\"Can't\", 'is', 'a', 'contraction']</span>"}
+      ]
+    },
+    {
+      "fnName": "stopwords · pos_tag · ne_chunk",
+      "badgeCls": "b-teal",
+      "badgeText": "NLTK",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "<code>stopwords</code>는 분석에 의미 없는 불용어 목록을 제공한다. <code>pos_tag</code>는 품사 태깅(POS), <code>ne_chunk</code>는 개체명 인식(NER)을 수행한다."},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "nltk.<span class=\"fn\">download</span>(<span class=\"st\">'stopwords'</span>)\n<span class=\"kw\">from</span> nltk.corpus <span class=\"kw\">import</span> stopwords\n\nenglish_stops = <span class=\"fn\">set</span>(stopwords.<span class=\"fn\">words</span>(<span class=\"st\">'english'</span>))\nwords = [<span class=\"st\">\"Can't\"</span>, <span class=\"st\">\"is\"</span>, <span class=\"st\">\"a\"</span>, <span class=\"st\">\"contraction\"</span>]\nfiltered = [w <span class=\"kw\">for</span> w <span class=\"kw\">in</span> words <span class=\"kw\">if</span> w <span class=\"kw\">not in</span> english_stops]\n<span class=\"cm\"># [\"Can't\", 'contraction']</span>\n\n<span class=\"cm\"># 품사 태깅 + NER</span>\n<span class=\"kw\">from</span> nltk <span class=\"kw\">import</span> word_tokenize, pos_tag, ne_chunk\nnltk.<span class=\"fn\">download</span>(<span class=\"st\">'averaged_perceptron_tagger_eng'</span>)\nnltk.<span class=\"fn\">download</span>(<span class=\"st\">'maxent_ne_chunker_tab'</span>)\n\nsentence = <span class=\"st\">\"James is working at Disney in London\"</span>\ntokens = <span class=\"fn\">word_tokenize</span>(sentence)\ntagged = <span class=\"fn\">pos_tag</span>(tokens)         <span class=\"cm\"># [('James','NNP'), ('Disney','NNP')...]</span>\nner_tree = <span class=\"fn\">ne_chunk</span>(tagged)      <span class=\"cm\"># 고유명사 → PERSON / ORGANIZATION / GPE</span>"},
+        {"type": "tip", "html": "NER 결과는 트리 구조로 반환됨. <code>ne_chunk(tagged, binary=True)</code>로 NE 여부만 이진 판별 가능."}
+      ]
+    }
+  ],
+  "nltk_classify": [
+    {
+      "fnName": "FreqDist · NaiveBayesClassifier",
+      "badgeCls": "b-blue",
+      "badgeText": "NLTK",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "NLTK의 <code>FreqDist</code>로 말뭉치 단어 빈도를 계산하고, 상위 N개 단어를 피처로 삼아 <code>NaiveBayesClassifier</code>로 텍스트 분류 모델을 학습한다. 영화 리뷰(pos/neg) 같은 감성 분류에 바로 적용 가능하다."},
+        {"type": "slbl", "text": "코드 예시 — movie_reviews 감성 분류"},
+        {"type": "pre", "html": "<span class=\"kw\">import</span> nltk\nnltk.<span class=\"fn\">download</span>(<span class=\"st\">'movie_reviews'</span>)\n<span class=\"kw\">from</span> nltk.corpus <span class=\"kw\">import</span> movie_reviews\n<span class=\"kw\">import</span> random\n\n<span class=\"cm\"># 문서 로딩 및 셔플</span>\ndocuments = [(list(movie_reviews.<span class=\"fn\">words</span>(fid)), cat)\n             <span class=\"kw\">for</span> cat <span class=\"kw\">in</span> movie_reviews.<span class=\"fn\">categories</span>()\n             <span class=\"kw\">for</span> fid <span class=\"kw\">in</span> movie_reviews.<span class=\"fn\">fileids</span>(cat)]\nrandom.<span class=\"fn\">shuffle</span>(documents)\n\n<span class=\"cm\"># 상위 20개 단어를 피처로 사용</span>\nall_words = nltk.<span class=\"fn\">FreqDist</span>(w.<span class=\"fn\">lower</span>() <span class=\"kw\">for</span> w <span class=\"kw\">in</span> movie_reviews.<span class=\"fn\">words</span>())\nword_features = <span class=\"fn\">list</span>(all_words)[:20]\n\n<span class=\"kw\">def</span> <span class=\"fn\">document_features</span>(document):\n    doc_words = <span class=\"fn\">set</span>(document)\n    <span class=\"kw\">return</span> {<span class=\"st\">f'contains({w})'</span>: (w <span class=\"kw\">in</span> doc_words) <span class=\"kw\">for</span> w <span class=\"kw\">in</span> word_features}\n\nfeaturesets = [(<span class=\"fn\">document_features</span>(d), c) <span class=\"kw\">for</span> d, c <span class=\"kw\">in</span> documents]\ntrain_set, test_set = featuresets[<span class=\"nm\">100</span>:], featuresets[:<span class=\"nm\">100</span>]\n\nclassifier = nltk.NaiveBayesClassifier.<span class=\"fn\">train</span>(train_set)\nprint(nltk.classify.<span class=\"fn\">accuracy</span>(classifier, test_set))  <span class=\"cm\"># ~0.70</span>"},
+        {"type": "tip", "html": "피처로 사용할 단어 수를 늘리면 정확도가 올라가지만 속도는 느려짐. <code>most_common(2000)</code> 수준이 실용적."}
+      ]
+    }
+  ],
+  "gensim_dict": [
+    {
+      "fnName": "corpora.Dictionary · doc2bow",
+      "badgeCls": "b-blue",
+      "badgeText": "Gensim",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "Gensim의 <code>Dictionary</code>는 토큰 목록으로부터 단어↔정수 인덱스 매핑을 구축한다. <code>doc2bow()</code>는 문서를 <code>(단어_id, 빈도)</code> 쌍의 리스트(BoW 벡터)로 변환하며, 모델 학습의 입력 형식이다."},
+        {"type": "slbl", "text": "핵심 메서드"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>Dictionary(texts)</td><td>list[list[str]]</td><td>토큰화된 문서 리스트로 사전 구축</td></tr><tr><td>add_documents(texts)</td><td>list[list[str]]</td><td>기존 사전에 새 문서 추가</td></tr><tr><td>doc2bow(tokens)</td><td>list[str]</td><td>(id, count) 튜플 리스트 반환</td></tr><tr><td>token2id</td><td>dict</td><td>단어 → 인덱스 매핑</td></tr><tr><td>filter_tokens(bad_ids)</td><td>list[int]</td><td>특정 id의 단어 사전에서 제거</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> gensim <span class=\"kw\">import</span> corpora\n<span class=\"kw\">from</span> collections <span class=\"kw\">import</span> defaultdict\n\ntext_corpus = [\n    <span class=\"st\">\"Human machine interface for lab computer applications\"</span>,\n    <span class=\"st\">\"A survey of user opinion of computer system response time\"</span>,\n]\nstoplist = <span class=\"fn\">set</span>(<span class=\"st\">'for a of the and to in'</span>.<span class=\"fn\">split</span>())\ntexts = [[w <span class=\"kw\">for</span> w <span class=\"kw\">in</span> doc.<span class=\"fn\">lower</span>().<span class=\"fn\">split</span>() <span class=\"kw\">if</span> w <span class=\"kw\">not in</span> stoplist]\n         <span class=\"kw\">for</span> doc <span class=\"kw\">in</span> text_corpus]\n\n<span class=\"cm\"># 2회 이상 등장한 단어만 사전에 포함</span>\nfreq = defaultdict(<span class=\"fn\">int</span>)\n<span class=\"kw\">for</span> text <span class=\"kw\">in</span> texts:\n    <span class=\"kw\">for</span> token <span class=\"kw\">in</span> text: freq[token] += <span class=\"nm\">1</span>\nprocessed = [[t <span class=\"kw\">for</span> t <span class=\"kw\">in</span> text <span class=\"kw\">if</span> freq[t] > <span class=\"nm\">1</span>] <span class=\"kw\">for</span> text <span class=\"kw\">in</span> texts]\n\ndictionary = corpora.Dictionary(processed)\nprint(dictionary.token2id)  <span class=\"cm\"># {'computer': 0, 'survey': 1, ...}</span>\n\nbow_corpus = [dictionary.<span class=\"fn\">doc2bow</span>(text) <span class=\"kw\">for</span> text <span class=\"kw\">in</span> processed]\n<span class=\"cm\"># [[(0, 1), (1, 1)], [(0, 1), (2, 1)]]  ← (단어id, 빈도)</span>"}
+      ]
+    },
+    {
+      "fnName": "models.TfidfModel",
+      "badgeCls": "b-teal",
+      "badgeText": "Gensim",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "BoW 코퍼스를 TF-IDF 가중치 표현으로 변환하는 Gensim 모델. 학습 후 <code>tfidf[bow_vector]</code>로 임의 문서를 변환할 수 있다."},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> gensim <span class=\"kw\">import</span> models\n\ntfidf = models.<span class=\"fn\">TfidfModel</span>(bow_corpus)  <span class=\"cm\"># 코퍼스 전체로 IDF 계산</span>\n\n<span class=\"cm\"># 단일 문서 변환</span>\nnew_bow = dictionary.<span class=\"fn\">doc2bow</span>(<span class=\"st\">\"graph trees\"</span>.<span class=\"fn\">split</span>())\nprint(tfidf[new_bow])  <span class=\"cm\"># [(id, tfidf_score), ...]</span>\n\n<span class=\"cm\"># 전체 코퍼스 변환</span>\ncorpus_tfidf = tfidf[bow_corpus]\n<span class=\"kw\">for</span> doc <span class=\"kw\">in</span> corpus_tfidf:\n    print(doc)"}
+      ]
+    }
+  ],
+  "gensim_topic": [
+    {
+      "fnName": "models.LsiModel",
+      "badgeCls": "b-purple",
+      "badgeText": "Topic Model",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "잠재 의미 분석(LSA/LSI) 모델. TF-IDF 코퍼스를 입력받아 SVD로 잠재 토픽을 추출한다. <code>num_topics</code>개의 토픽을 구성하는 단어 가중치를 <code>print_topics()</code>로 확인할 수 있다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>corpus</td><td>BoW/TF-IDF</td><td>학습 코퍼스</td></tr><tr><td>id2word</td><td>Dictionary</td><td>인덱스 → 단어 매핑 (토픽 해석용)</td></tr><tr><td>num_topics</td><td>int</td><td>추출할 토픽 수</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> gensim <span class=\"kw\">import</span> models\n\nlsi = models.<span class=\"fn\">LsiModel</span>(corpus_tfidf, id2word=dictionary, num_topics=<span class=\"nm\">2</span>)\n\n<span class=\"cm\"># 토픽별 주요 단어 확인</span>\nlsi.<span class=\"fn\">print_topics</span>(<span class=\"nm\">2</span>)\n<span class=\"cm\"># [(0, '0.703*\"trees\" + 0.538*\"graph\" + ...'),\n#  (1, '0.460*\"system\" + 0.373*\"user\" + ...')]</span>\n\n<span class=\"cm\"># 각 문서의 토픽 분포</span>\ncorpus_lsi = lsi[corpus_tfidf]\n<span class=\"kw\">for</span> doc <span class=\"kw\">in</span> corpus_lsi:\n    print(doc)  <span class=\"cm\"># [(토픽id, 가중치), ...]</span>"},
+        {"type": "tip", "html": "토픽 수는 도메인 지식 기반으로 설정. <code>LdaModel</code>은 확률적 토픽 모델로 더 해석 가능한 토픽을 생성한다."}
+      ]
+    }
+  ],
+  "gensim_word2vec": [
+    {
+      "fnName": "Word2Vec",
+      "badgeCls": "b-blue",
+      "badgeText": "Embedding",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "단어를 밀집 벡터(dense vector)로 표현하는 임베딩 모델. Skip-gram(<code>sg=1</code>)은 중심 단어로 주변 단어를 예측하고, CBOW(<code>sg=0</code>)는 반대 방향이다. 학습 후 단어 간 의미적 유사도 계산, 유추 연산 등이 가능하다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>sentences</td><td>list[list[str]]</td><td>토큰화된 문장 리스트</td></tr><tr><td>vector_size</td><td>int=100</td><td>임베딩 차원 수</td></tr><tr><td>window</td><td>int=5</td><td>컨텍스트 윈도우 크기</td></tr><tr><td>min_count</td><td>int=5</td><td>최소 등장 횟수 (미만 단어 무시)</td></tr><tr><td>sg</td><td>0|1=0</td><td>1: Skip-gram, 0: CBOW</td></tr><tr><td>epochs</td><td>int=5</td><td>학습 반복 횟수</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> gensim.models <span class=\"kw\">import</span> Word2Vec\n\nmodel = <span class=\"fn\">Word2Vec</span>(sentences, vector_size=<span class=\"nm\">100</span>, window=<span class=\"nm\">5</span>,\n                  min_count=<span class=\"nm\">1</span>, sg=<span class=\"nm\">1</span>, epochs=<span class=\"nm\">100</span>, seed=<span class=\"nm\">42</span>)\nmodel.<span class=\"fn\">save</span>(<span class=\"st\">'w2v_model'</span>)  <span class=\"cm\"># 저장</span>\n\n<span class=\"cm\"># 유사도</span>\nprint(model.wv.<span class=\"fn\">similarity</span>(<span class=\"st\">'actor'</span>, <span class=\"st\">'actress'</span>))  <span class=\"cm\"># 0.86</span>\nprint(model.wv.<span class=\"fn\">most_similar</span>(<span class=\"st\">'accident'</span>, topn=<span class=\"nm\">5</span>))\n\n<span class=\"cm\"># 유추 연산: actor - actress + she = ?</span>\nprint(model.wv.<span class=\"fn\">most_similar</span>(\n    positive=[<span class=\"st\">'actor'</span>, <span class=\"st\">'she'</span>], negative=[<span class=\"st\">'actress'</span>], topn=<span class=\"nm\">3</span>\n))\n<span class=\"cm\"># 이상값 탐지</span>\nprint(model.wv.<span class=\"fn\">doesnt_match</span>(<span class=\"st\">'man woman child kitchen'</span>.<span class=\"fn\">split</span>()))"},
+        {"type": "warn", "html": "Word2Vec은 Bigram을 기본 지원하지 않음. <code>new_york</code> 같은 복합어는 <code>Phrases</code>로 사전 처리 필요."}
+      ]
+    },
+    {
+      "fnName": "Phrases · Phraser (Bigram)",
+      "badgeCls": "b-teal",
+      "badgeText": "Bigram",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "자주 함께 등장하는 단어 쌍을 <code>new_york</code>처럼 하나의 토큰으로 합친다. <code>Phrases</code>로 빅그램 규칙을 학습하고, <code>Phraser</code>로 경량화한 후 문장에 적용한다."},
+        {"type": "slbl", "text": "핵심 파라미터"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>min_count</td><td>int=5</td><td>단어 쌍 최소 등장 횟수</td></tr><tr><td>threshold</td><td>float=10.0</td><td>결합 강도 임계값 — 낮을수록 더 많은 쌍 결합</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> gensim.models.phrases <span class=\"kw\">import</span> Phrases, Phraser\n\nraw_sentences = [\n    [<span class=\"st\">\"new\"</span>, <span class=\"st\">\"york\"</span>, <span class=\"st\">\"is\"</span>, <span class=\"st\">\"a\"</span>, <span class=\"st\">\"great\"</span>, <span class=\"st\">\"city\"</span>],\n    [<span class=\"st\">\"i\"</span>, <span class=\"st\">\"love\"</span>, <span class=\"st\">\"visiting\"</span>, <span class=\"st\">\"new\"</span>, <span class=\"st\">\"york\"</span>],\n]\nphrase_model = <span class=\"fn\">Phrases</span>(raw_sentences, min_count=<span class=\"nm\">1</span>, threshold=<span class=\"nm\">2</span>)\nbigram = <span class=\"fn\">Phraser</span>(phrase_model)  <span class=\"cm\"># 경량화</span>\nbigram_sentences = <span class=\"fn\">list</span>(bigram[raw_sentences])\nprint(bigram_sentences[<span class=\"nm\">0</span>])\n<span class=\"cm\"># ['new_york', 'is', 'a', 'great', 'city']</span>\n\n<span class=\"cm\"># Word2Vec에 bigram 적용된 문장으로 학습</span>\nmodel = <span class=\"fn\">Word2Vec</span>(sentences=bigram_sentences, vector_size=<span class=\"nm\">100</span>, window=<span class=\"nm\">5</span>)"}
+      ]
+    },
+    {
+      "fnName": "FastText",
+      "badgeCls": "b-purple",
+      "badgeText": "Embedding",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "Word2Vec의 확장으로 단어를 서브워드(문자 n-gram) 단위로 학습한다. 사전에 없는 OOV(Out-of-Vocabulary) 단어도 문자 수준에서 유사도를 계산할 수 있어 형태소가 풍부한 언어나 신조어 처리에 강하다."},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> gensim.models <span class=\"kw\">import</span> FastText\n\nft_model = <span class=\"fn\">FastText</span>(\n    sentences=sentences,\n    vector_size=<span class=\"nm\">100</span>, window=<span class=\"nm\">3</span>, min_count=<span class=\"nm\">1</span>,\n    sg=<span class=\"nm\">1</span>, epochs=<span class=\"nm\">100</span>, seed=<span class=\"nm\">42</span>\n)\n<span class=\"cm\"># 사전에 있는 단어</span>\nprint(ft_model.wv.<span class=\"fn\">most_similar</span>(<span class=\"st\">\"인공\"</span>, topn=<span class=\"nm\">5</span>))\n\n<span class=\"cm\"># OOV 단어도 처리 가능 (서브워드 기반)</span>\nprint(ft_model.wv.<span class=\"fn\">most_similar</span>(<span class=\"st\">\"인공지능기술\"</span>, topn=<span class=\"nm\">5</span>))"},
+        {"type": "tip", "html": "한국어처럼 형태 변화가 많은 언어에서 Word2Vec 대비 OOV 처리가 탁월. 모델 크기는 더 크다."}
+      ]
+    }
+  ],
+  "korean_nlp": [
+    {
+      "fnName": "KoNLPy — Okt · Kkma",
+      "badgeCls": "b-blue",
+      "badgeText": "KoNLPy",
+      "open": true,
+      "blocks": [
+        {"type": "meaning", "html": "KoNLPy는 한국어 형태소 분석 라이브러리. <code>Okt</code>(구 Twitter)는 속도가 빠르고 SNS 텍스트에 강하며, <code>Kkma</code>는 정확도가 높다. 명사·품사 추출, 형태소 분석, 어근 정규화(<code>stem=True</code>) 등을 지원한다."},
+        {"type": "slbl", "text": "주요 메서드"},
+        {"type": "table", "html": "<table class=\"pt\"><tr><td>morphs(text)</td><td></td><td>형태소 리스트 반환</td></tr><tr><td>nouns(text)</td><td></td><td>명사만 추출</td></tr><tr><td>pos(text, stem, norm)</td><td>bool</td><td>(단어, 품사) 튜플 리스트 — stem=어근화, norm=정규화</td></tr><tr><td>sentences(text)</td><td></td><td>문장 분리 (Kkma)</td></tr></table>"},
+        {"type": "slbl", "text": "코드 예시"},
+        {"type": "pre", "html": "<span class=\"kw\">from</span> konlpy.tag <span class=\"kw\">import</span> Okt, Kkma\n\nokt = <span class=\"fn\">Okt</span>()\nprint(okt.<span class=\"fn\">morphs</span>(<span class=\"st\">\"단독입찰보다 복수입찰의 경우\"</span>))\n<span class=\"cm\"># ['단독', '입찰', '보다', '복수', '입찰', '의', '경우']</span>\n\n<span class=\"cm\"># 품사 태깅 + 어근화</span>\nvoc = <span class=\"st\">\"딥러닝 모델은 대량의 데이터를 학습하여 예측한다.\"</span>\npos_result = okt.<span class=\"fn\">pos</span>(voc, norm=<span class=\"nm\">True</span>, stem=<span class=\"nm\">True</span>)\n\n<span class=\"cm\"># 명사, 동사, 형용사만 필터링</span>\nfiltered = [word <span class=\"kw\">for</span> word, tag <span class=\"kw\">in</span> pos_result\n            <span class=\"kw\">if</span> tag <span class=\"kw\">in</span> [<span class=\"st\">'Noun'</span>, <span class=\"st\">'Verb'</span>, <span class=\"st\">'Adjective'</span>]]\nprint(filtered)\n\n<span class=\"cm\"># Kkma: 고정확도 분석</span>\nkkma = <span class=\"fn\">Kkma</span>()\nprint(kkma.<span class=\"fn\">nouns</span>(<span class=\"st\">\"아버지가 방에 들어가신다.\"</span>))  <span class=\"cm\"># ['아버지', '방']</span>"},
+        {"type": "warn", "html": "KoNLPy는 Java 기반(JPype1 필요). Colab/Ubuntu에서는 <code>apt-get install default-jdk</code> 후 사용."}
+      ]
+    },
+    {
+      "fnName": "WordCloud (한국어)",
+      "badgeCls": "b-teal",
+      "badgeText": "Visualization",
+      "open": false,
+      "blocks": [
+        {"type": "meaning", "html": "웹 페이지에서 텍스트를 수집해 KoNLPy로 명사를 추출하고, 빈도 기반으로 WordCloud를 생성하는 파이프라인. 한국어 폰트 경로를 반드시 지정해야 한다."},
+        {"type": "slbl", "text": "코드 예시 — 웹 크롤링 → WordCloud"},
+        {"type": "pre", "html": "<span class=\"kw\">import</span> requests\n<span class=\"kw\">from</span> bs4 <span class=\"kw\">import</span> BeautifulSoup\n<span class=\"kw\">from</span> konlpy.tag <span class=\"kw\">import</span> Okt\n<span class=\"kw\">from</span> wordcloud <span class=\"kw\">import</span> WordCloud\n<span class=\"kw\">import</span> matplotlib.pyplot <span class=\"kw\">as</span> plt\n<span class=\"kw\">import</span> nltk\n\nfontpath = <span class=\"st\">'/usr/share/fonts/truetype/nanum/NanumBarunGothic.ttf'</span>\n\n<span class=\"cm\"># 크롤링</span>\nres = requests.<span class=\"fn\">get</span>(<span class=\"st\">'https://example.com/article'</span>)\nsoup = BeautifulSoup(res.content, <span class=\"st\">'html.parser'</span>)\nbody = soup.<span class=\"fn\">select</span>(<span class=\"st\">'.article_view'</span>)[<span class=\"nm\">0</span>]\ntext = <span class=\"st\">\" \"</span>.<span class=\"fn\">join</span>(p.<span class=\"fn\">get_text</span>() <span class=\"kw\">for</span> p <span class=\"kw\">in</span> body.<span class=\"fn\">find_all</span>(<span class=\"st\">'p'</span>))\n\n<span class=\"cm\"># 명사 추출 + 빈도 계산</span>\nokt = <span class=\"fn\">Okt</span>()\ntokens = okt.<span class=\"fn\">nouns</span>(text)\nko = nltk.<span class=\"fn\">Text</span>(tokens)\ndata = dict(ko.<span class=\"fn\">vocab</span>().<span class=\"fn\">most_common</span>(<span class=\"nm\">300</span>))\n\n<span class=\"cm\"># 불용어 제거 후 WordCloud</span>\nstopwords = [<span class=\"st\">'것'</span>, <span class=\"st\">'이'</span>, <span class=\"st\">'말'</span>, <span class=\"st\">'등'</span>]\nfiltered = {k: v <span class=\"kw\">for</span> k, v <span class=\"kw\">in</span> data.<span class=\"fn\">items</span>() <span class=\"kw\">if</span> k <span class=\"kw\">not in</span> stopwords}\n\nwc = <span class=\"fn\">WordCloud</span>(font_path=fontpath, background_color=<span class=\"st\">'white'</span>,\n              relative_scaling=<span class=\"nm\">0.1</span>).<span class=\"fn\">generate_from_frequencies</span>(filtered)\nplt.<span class=\"fn\">figure</span>(figsize=(<span class=\"nm\">16</span>, <span class=\"nm\">8</span>))\nplt.<span class=\"fn\">imshow</span>(wc); plt.<span class=\"fn\">axis</span>(<span class=\"st\">'off'</span>); plt.<span class=\"fn\">show</span>()"},
+        {"type": "tip", "html": "2글자 이상 단어만 포함하면 의미 없는 단음절이 제거돼 품질이 올라감: <code>{k: v for k, v in data.items() if len(k) > 1}</code>"}
+      ]
+    }
+  ]
+}

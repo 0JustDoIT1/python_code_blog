@@ -229,6 +229,22 @@ export const LIBRARIES: Library[] = [
       { id: "oneclass_svm", label: "이상탐지" },
     ],
   },
+  {
+  slug: 'text_mining',
+  title: 'Text Mining',
+  description: 'One-Hot · TF-IDF · NLTK · Gensim · Word2Vec · KoNLPy',
+  icon: '言',
+  color: '#7c3aed',
+  sections: [
+    { id: 'encoding',        label: 'Encoding & TF-IDF' },
+    { id: 'nltk_basic',      label: 'NLTK 토크나이징' },
+    { id: 'nltk_classify',   label: 'NLTK 분류' },
+    { id: 'gensim_dict',     label: 'Gensim Dictionary' },
+    { id: 'gensim_topic',    label: 'LSI 토픽 모델링' },
+    { id: 'gensim_word2vec', label: 'Word2Vec / FastText' },
+    { id: 'korean_nlp',      label: 'KoNLPy · WordCloud' },
+  ],
+},
 ];
 
 export function getLibrary(slug: string): Library | undefined {
