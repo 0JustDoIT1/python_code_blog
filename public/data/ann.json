@@ -1,0 +1,308 @@
+{
+  "mlp_basic": [
+    {
+      "fnName": "MLPClassifier()",
+      "badgeCls": "b-blue",
+      "badgeText": "분류",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "다층 퍼셉트론(Multi-Layer Perceptron) 분류기. 입력층 → 은닉층(들) → 출력층으로 구성되며, 각 층 사이는 가중치 행렬로 연결된다. 비선형 결정경계를 학습할 수 있어 XOR 같은 선형 분리 불가능 문제도 처리 가능하다."
+        },
+        {
+          "type": "slbl",
+          "text": "핵심 파라미터"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>hidden_layer_sizes</td><td>tuple=(100,)</td><td>각 은닉층의 뉴런 수. (100,)=1층 100개, (30,10)=2층</td></tr><tr><td>activation</td><td>str='relu'</td><td>은닉층 활성화함수: 'relu', 'tanh', 'logistic'</td></tr><tr><td>solver</td><td>str='adam'</td><td>가중치 최적화 알고리즘: 'adam', 'sgd', 'lbfgs'</td></tr><tr><td>alpha</td><td>float=0.0001</td><td>L2 규제 강도 — 클수록 과적합 억제</td></tr><tr><td>max_iter</td><td>int=200</td><td>최대 에포크 수</td></tr><tr><td>random_state</td><td>int=None</td><td>재현성을 위한 시드값</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.neural_network <span class=\"kw\">import</span> MLPClassifier\n<span class=\"kw\">from</span> sklearn.datasets <span class=\"kw\">import</span> make_moons\n<span class=\"kw\">from</span> sklearn.model_selection <span class=\"kw\">import</span> train_test_split\n\nX, y = make_moons(n_samples=<span class=\"nm\">100</span>, noise=<span class=\"nm\">0.25</span>, random_state=<span class=\"nm\">3</span>)\nX_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, random_state=<span class=\"nm\">42</span>)\n\n<span class=\"cm\"># 은닉층 1개(뉴런 100개)</span>\nmlp = <span class=\"fn\">MLPClassifier</span>(\n    hidden_layer_sizes=(<span class=\"nm\">100</span>,),\n    activation=<span class=\"st\">'relu'</span>,\n    solver=<span class=\"st\">'adam'</span>,\n    max_iter=<span class=\"nm\">3000</span>,\n    random_state=<span class=\"nm\">0</span>\n)\nmlp.<span class=\"fn\">fit</span>(X_train, y_train)\n<span class=\"fn\">print</span>(mlp.<span class=\"fn\">score</span>(X_test, y_test))  <span class=\"cm\"># 정확도</span>"
+        },
+        {
+          "type": "tip",
+          "html": "<b>가중치 형태 확인:</b> <code>mlp.coefs_[i].shape</code>로 각 층의 가중치 행렬 크기 확인 가능. 입력 2개 → 은닉 100개면 <code>coefs_[0].shape == (2, 100)</code>."
+        }
+      ]
+    },
+    {
+      "fnName": "MLPRegressor()",
+      "badgeCls": "b-teal",
+      "badgeText": "회귀",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "다층 퍼셉트론 회귀기. 출력층 활성화함수가 identity(선형)이므로 연속값을 예측한다. 비선형 데이터에 강하며, <code>early_stopping=True</code>로 과적합을 조기에 방지할 수 있다."
+        },
+        {
+          "type": "slbl",
+          "text": "핵심 파라미터"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>hidden_layer_sizes</td><td>tuple=(100,)</td><td>은닉층 구조</td></tr><tr><td>activation</td><td>str='relu'</td><td>은닉층 활성화함수</td></tr><tr><td>learning_rate_init</td><td>float=0.001</td><td>초기 학습률 (adam/sgd)</td></tr><tr><td>early_stopping</td><td>bool=False</td><td>검증 손실 개선 없으면 조기 종료</td></tr><tr><td>n_iter_no_change</td><td>int=10</td><td>개선 없을 때 허용 에포크 수</td></tr><tr><td>validation_fraction</td><td>float=0.1</td><td>early_stopping용 검증 데이터 비율</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.neural_network <span class=\"kw\">import</span> MLPRegressor\n<span class=\"kw\">from</span> sklearn.preprocessing <span class=\"kw\">import</span> StandardScaler\n<span class=\"kw\">from</span> sklearn.metrics <span class=\"kw\">import</span> mean_squared_error\n\nscaler = <span class=\"fn\">StandardScaler</span>()\nX_train_s = scaler.<span class=\"fn\">fit_transform</span>(X_train)\nX_test_s  = scaler.<span class=\"fn\">transform</span>(X_test)\n\nmlp = <span class=\"fn\">MLPRegressor</span>(\n    hidden_layer_sizes=(<span class=\"nm\">100</span>, <span class=\"nm\">100</span>),\n    activation=<span class=\"st\">'relu'</span>,\n    solver=<span class=\"st\">'adam'</span>,\n    learning_rate_init=<span class=\"nm\">0.01</span>,\n    max_iter=<span class=\"nm\">1000</span>,\n    early_stopping=<span class=\"kw\">True</span>,\n    n_iter_no_change=<span class=\"nm\">20</span>,\n    random_state=<span class=\"nm\">42</span>\n)\nmlp.<span class=\"fn\">fit</span>(X_train_s, y_train)\nmse = <span class=\"fn\">mean_squared_error</span>(y_test, mlp.<span class=\"fn\">predict</span>(X_test_s))\n<span class=\"fn\">print</span>(<span class=\"st\">f\"MSE: {mse:.4f}\"</span>)"
+        },
+        {
+          "type": "warn",
+          "html": "StandardScaler 전처리 필수. 스케일 미적용 시 학습이 불안정하거나 수렴하지 않을 수 있다."
+        }
+      ]
+    },
+    {
+      "fnName": "solver 선택 기준",
+      "badgeCls": "b-amber",
+      "badgeText": "하이퍼파라미터",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "solver는 가중치를 업데이트하는 최적화 알고리즘. 데이터 크기와 목적에 따라 선택이 달라진다."
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"cmp-table\"><tr><th>solver</th><th>특징</th><th>적합한 상황</th></tr><tr><td>adam</td><td>학습률 자동 적응 (beta_1, beta_2)</td><td>대용량 데이터, 기본값 추천</td></tr><tr><td>sgd</td><td>확률적 경사하강법, momentum 지원</td><td>세밀한 학습률 제어가 필요할 때</td></tr><tr><td>lbfgs</td><td>준뉴턴법, 전체 데이터 사용</td><td>소량 데이터, 빠른 수렴</td></tr></table>"
+        },
+        {
+          "type": "tip",
+          "html": "소량 데이터(수백~수천 샘플)에는 <code>lbfgs</code>가 빠르고 안정적. 대용량은 <code>adam</code>이 기본 선택."
+        }
+      ]
+    }
+  ],
+  "loss_functions": [
+    {
+      "fnName": "Binary Cross-Entropy",
+      "badgeCls": "b-blue",
+      "badgeText": "손실함수",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "이진분류의 손실함수. 실제 레이블이 1일 때는 <code>-log(p)</code>, 0일 때는 <code>-log(1-p)</code>를 적용한 평균값. 예측 확률이 실제값과 가까울수록 손실이 작아진다. sklearn의 Log-Loss와 동일한 개념이다."
+        },
+        {
+          "type": "slbl",
+          "text": "수식 및 구현"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\n<span class=\"kw\">def</span> <span class=\"fn\">binary_cross_entropy</span>(y_true, y_pred):\n    epsilon = <span class=\"nm\">1e-15</span>  <span class=\"cm\"># log(0) → -∞ 방지</span>\n    y_pred = np.<span class=\"fn\">clip</span>(y_pred, epsilon, <span class=\"nm\">1</span> - epsilon)\n    loss = -np.<span class=\"fn\">mean</span>(\n        y_true * np.<span class=\"fn\">log</span>(y_pred) +          <span class=\"cm\"># 실제 1일 때</span>\n        (<span class=\"nm\">1</span> - y_true) * np.<span class=\"fn\">log</span>(<span class=\"nm\">1</span> - y_pred)  <span class=\"cm\"># 실제 0일 때</span>\n    )\n    <span class=\"kw\">return</span> loss\n\ny_true = np.<span class=\"fn\">array</span>([<span class=\"nm\">1</span>, <span class=\"nm\">0</span>, <span class=\"nm\">1</span>, <span class=\"nm\">1</span>, <span class=\"nm\">0</span>])\ny_pred = np.<span class=\"fn\">array</span>([<span class=\"nm\">0.9</span>, <span class=\"nm\">0.1</span>, <span class=\"nm\">0.8</span>, <span class=\"nm\">0.7</span>, <span class=\"nm\">0.2</span>])\n<span class=\"fn\">print</span>(<span class=\"fn\">binary_cross_entropy</span>(y_true, y_pred))  <span class=\"cm\"># 낮을수록 좋음</span>"
+        },
+        {
+          "type": "tip",
+          "html": "<code>np.clip(y_pred, 1e-15, 1-1e-15)</code>로 예측값을 0과 1 사이로 강제 제한 — log(0) 발산 방지."
+        }
+      ]
+    },
+    {
+      "fnName": "Categorical Cross-Entropy + Softmax",
+      "badgeCls": "b-blue",
+      "badgeText": "손실함수",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "다중분류의 손실함수. 신경망 출력(logit)을 Softmax로 확률 변환 후, 실제 클래스의 확률에 대한 음의 로그값 평균을 계산한다. 큰 logit 값이 더 강조되도록 exp를 사용하여 클래스 간 차이를 극대화한다."
+        },
+        {
+          "type": "slbl",
+          "text": "Softmax 구현"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">def</span> <span class=\"fn\">softmax</span>(z):\n    <span class=\"cm\"># 수치 안정성: max를 빼서 overflow 방지</span>\n    exp_z = np.<span class=\"fn\">exp</span>(z - np.<span class=\"fn\">max</span>(z, axis=<span class=\"nm\">1</span>, keepdims=<span class=\"kw\">True</span>))\n    <span class=\"kw\">return</span> exp_z / np.<span class=\"fn\">sum</span>(exp_z, axis=<span class=\"nm\">1</span>, keepdims=<span class=\"kw\">True</span>)\n\n<span class=\"kw\">def</span> <span class=\"fn\">categorical_cross_entropy</span>(y_true, y_pred):\n    epsilon = <span class=\"nm\">1e-15</span>\n    y_pred = np.<span class=\"fn\">clip</span>(y_pred, epsilon, <span class=\"nm\">1</span> - epsilon)\n    <span class=\"kw\">return</span> -np.<span class=\"fn\">mean</span>(np.<span class=\"fn\">sum</span>(y_true * np.<span class=\"fn\">log</span>(y_pred), axis=<span class=\"nm\">1</span>))\n\n<span class=\"cm\"># 원-핫 인코딩된 실제값</span>\ny_true = np.<span class=\"fn\">array</span>([[<span class=\"nm\">1</span>,<span class=\"nm\">0</span>,<span class=\"nm\">0</span>], [<span class=\"nm\">0</span>,<span class=\"nm\">1</span>,<span class=\"nm\">0</span>], [<span class=\"nm\">0</span>,<span class=\"nm\">0</span>,<span class=\"nm\">1</span>]])\nlogits = np.<span class=\"fn\">array</span>([[<span class=\"nm\">2.0</span>,<span class=\"nm\">1.0</span>,<span class=\"nm\">0.1</span>], [<span class=\"nm\">1.2</span>,<span class=\"nm\">2.5</span>,<span class=\"nm\">0.3</span>], [<span class=\"nm\">0.3</span>,<span class=\"nm\">0.8</span>,<span class=\"nm\">2.0</span>]])\ny_pred = <span class=\"fn\">softmax</span>(logits)\nloss = <span class=\"fn\">categorical_cross_entropy</span>(y_true, y_pred)\n<span class=\"fn\">print</span>(<span class=\"st\">f\"Loss: {loss:.4f}\"</span>)"
+        },
+        {
+          "type": "warn",
+          "html": "Softmax 계산 시 <code>z - max(z)</code>를 먼저 빼야 수치 안정성 확보. 이 과정 없이 큰 logit에 exp를 바로 적용하면 overflow 발생."
+        }
+      ]
+    }
+  ],
+  "activation_functions": [
+    {
+      "fnName": "activation 비교 (sigmoid / tanh / relu)",
+      "badgeCls": "b-purple",
+      "badgeText": "활성화함수",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "활성화함수는 각 층의 선형 연산 결과에 비선형성을 부여한다. 은닉층에는 relu/tanh, 출력층에는 문제 유형에 맞는 함수를 선택한다. relu는 학습속도가 빠르고 깊은 네트워크에 강하지만, tanh는 출력이 -1~1로 중심이 0이라 일부 상황에서 유리하다."
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"cmp-table\"><tr><th>함수</th><th>출력범위</th><th>특징</th><th>주사용처</th></tr><tr><td>sigmoid (logistic)</td><td>0 ~ 1</td><td>기울기 소실 문제, 이진 확률 해석</td><td>출력층 (이진분류)</td></tr><tr><td>tanh</td><td>-1 ~ 1</td><td>sigmoid 개선, 중심값 0</td><td>은닉층 (소규모 네트워크)</td></tr><tr><td>relu</td><td>0 ~ ∞</td><td>빠른 학습, 음수는 0으로 처리</td><td>은닉층 (기본 선택)</td></tr><tr><td>identity</td><td>-∞ ~ ∞</td><td>변환 없음</td><td>출력층 (회귀)</td></tr><tr><td>softmax</td><td>0 ~ 1 (합=1)</td><td>다중클래스 확률 변환</td><td>출력층 (다중분류)</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "tanh 직접 구현"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\n<span class=\"kw\">def</span> <span class=\"fn\">tanh_function</span>(x):\n    exp_x     = np.<span class=\"fn\">exp</span>(x)\n    exp_neg_x = np.<span class=\"fn\">exp</span>(-x)\n    <span class=\"kw\">return</span> (exp_x - exp_neg_x) / (exp_x + exp_neg_x)\n\nz = np.<span class=\"fn\">array</span>([<span class=\"nm\">-1.0</span>, <span class=\"nm\">0.0</span>, <span class=\"nm\">2.0</span>])\n<span class=\"fn\">print</span>(<span class=\"fn\">tanh_function</span>(z))        <span class=\"cm\"># [-0.762  0.     0.964]</span>\n<span class=\"fn\">print</span>(np.<span class=\"fn\">tanh</span>(z))              <span class=\"cm\"># 내장 함수와 동일</span>\n\n<span class=\"cm\"># 포화(saturation): 극단값에서 기울기 ≈ 0</span>\n<span class=\"fn\">print</span>(np.<span class=\"fn\">tanh</span>(-<span class=\"nm\">100</span>))           <span class=\"cm\"># -1.0 (포화)</span>"
+        },
+        {
+          "type": "tip",
+          "html": "<b>출력층 선택 기준:</b> 회귀 → identity, 이진분류 → sigmoid, 다중분류 → softmax. sklearn MLPClassifier는 이를 자동으로 설정한다."
+        }
+      ]
+    }
+  ],
+  "training_tuning": [
+    {
+      "fnName": "ValidationCurveDisplay",
+      "badgeCls": "b-teal",
+      "badgeText": "하이퍼파라미터 탐색",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "단일 하이퍼파라미터를 범위를 바꿔가며 훈련/검증 점수를 시각화. 과적합·과소적합 구간을 직관적으로 파악하고 최적값을 선택할 때 사용한다."
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.model_selection <span class=\"kw\">import</span> ValidationCurveDisplay\n<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\nparam_range = np.<span class=\"fn\">logspace</span>(-<span class=\"nm\">5</span>, <span class=\"nm\">2</span>, <span class=\"nm\">8</span>)  <span class=\"cm\"># alpha 후보값 8개</span>\n\n<span class=\"fn\">ValidationCurveDisplay.from_estimator</span>(\n    estimator=mlp,\n    X=X_train,\n    y=y_train,\n    param_name=<span class=\"st\">\"alpha\"</span>,   <span class=\"cm\"># 탐색할 파라미터</span>\n    param_range=param_range,\n    score_name=<span class=\"st\">\"Accuracy\"</span>,\n    cv=<span class=\"nm\">5</span>,\n    ax=ax\n)\nax.<span class=\"fn\">set_xscale</span>(<span class=\"st\">\"log\"</span>)  <span class=\"cm\"># 로그스케일로 가독성 향상</span>"
+        },
+        {
+          "type": "tip",
+          "html": "훈련점수=1, 검증점수=낮음 → 과적합. 둘 다 낮음 → 과소적합. 검증점수가 가장 높은 alpha가 최적값."
+        }
+      ]
+    },
+    {
+      "fnName": "LearningCurveDisplay",
+      "badgeCls": "b-teal",
+      "badgeText": "학습곡선",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "훈련 데이터 크기를 점차 늘려가며 훈련/검증 점수 변화를 시각화. 데이터를 더 수집해야 하는지, 모델 복잡도를 조정해야 하는지 판단하는 데 사용한다."
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.model_selection <span class=\"kw\">import</span> LearningCurveDisplay\n<span class=\"kw\">import</span> numpy <span class=\"kw\">as</span> np\n\ntrain_sizes = np.<span class=\"fn\">linspace</span>(<span class=\"nm\">0.1</span>, <span class=\"nm\">1.0</span>, <span class=\"nm\">5</span>)  <span class=\"cm\"># 10%~100%</span>\n\n<span class=\"fn\">LearningCurveDisplay.from_estimator</span>(\n    estimator=mlp,\n    X=X_train,\n    y=y_train,\n    train_sizes=train_sizes,\n    score_name=<span class=\"st\">\"Accuracy\"</span>,\n    cv=<span class=\"nm\">5</span>,\n    ax=ax\n)"
+        },
+        {
+          "type": "tip",
+          "html": "훈련점수가 항상 1.0이고 검증점수가 데이터 증가에도 완만하게 수렴 → 데이터 추가 확보로 성능 향상 가능. 검증점수가 이미 수렴 → 모델 구조 개선 필요."
+        }
+      ]
+    },
+    {
+      "fnName": "hidden_layer_sizes × alpha 그리드",
+      "badgeCls": "b-amber",
+      "badgeText": "하이퍼파라미터",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "은닉층 뉴런 수와 L2 규제(alpha)를 조합한 결정경계를 격자 형태로 비교. 뉴런 수가 많을수록 복잡한 경계를 학습하고, alpha가 작을수록 과적합 위험이 높아진다."
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "fig, axes = plt.<span class=\"fn\">subplots</span>(<span class=\"nm\">3</span>, <span class=\"nm\">4</span>, figsize=(<span class=\"nm\">20</span>, <span class=\"nm\">8</span>))\n\n<span class=\"kw\">for</span> axx, n_nodes <span class=\"kw\">in</span> <span class=\"fn\">zip</span>(axes, [<span class=\"nm\">10</span>, <span class=\"nm\">50</span>, <span class=\"nm\">100</span>]):\n    <span class=\"kw\">for</span> ax, alpha <span class=\"kw\">in</span> <span class=\"fn\">zip</span>(axx, [<span class=\"nm\">0.1</span>, <span class=\"nm\">0.01</span>, <span class=\"nm\">0.001</span>, <span class=\"nm\">0.0001</span>]):\n        mlp = <span class=\"fn\">MLPClassifier</span>(\n            solver=<span class=\"st\">'lbfgs'</span>,\n            activation=<span class=\"st\">'tanh'</span>,\n            hidden_layer_sizes=[n_nodes, n_nodes],  <span class=\"cm\"># 2층</span>\n            alpha=alpha,\n            max_iter=<span class=\"nm\">1000</span>,\n            random_state=<span class=\"nm\">0</span>\n        )\n        mlp.<span class=\"fn\">fit</span>(X_train, y_train)\n        <span class=\"cm\"># 결정경계 시각화 함수 호출</span>"
+        },
+        {
+          "type": "warn",
+          "html": "alpha(규제)가 약할수록 과적합 발생. hidden_layer_sizes=[n, n]처럼 동일 크기 2층이면 더 세밀한 경계를 학습 → 과적합 위험 증가."
+        }
+      ]
+    }
+  ],
+  "threshold_calibration": [
+    {
+      "fnName": "CalibratedClassifierCV()",
+      "badgeCls": "b-purple",
+      "badgeText": "확률 교정",
+      "open": true,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "신경망의 출력 확률(logit → softmax/sigmoid)이 실제 사후확률과 일치하지 않을 수 있다. <code>CalibratedClassifierCV</code>는 sigmoid나 isotonic 회귀를 적용해 확률값을 실제 빈도에 맞게 교정한다."
+        },
+        {
+          "type": "slbl",
+          "text": "핵심 파라미터"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>estimator</td><td>estimator</td><td>교정할 기반 분류기</td></tr><tr><td>method</td><td>str='sigmoid'</td><td>'sigmoid'(플랫 스케일링) 또는 'isotonic'(비모수)</td></tr><tr><td>cv</td><td>int=5</td><td>교차검증 폴드 수</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.calibration <span class=\"kw\">import</span> CalibratedClassifierCV\n<span class=\"kw\">from</span> sklearn.neural_network <span class=\"kw\">import</span> MLPClassifier\n\nmlp = <span class=\"fn\">MLPClassifier</span>(hidden_layer_sizes=(<span class=\"nm\">30</span>, <span class=\"nm\">30</span>, <span class=\"nm\">30</span>), max_iter=<span class=\"nm\">1000</span>, random_state=<span class=\"nm\">42</span>)\nmlp.<span class=\"fn\">fit</span>(X_train, y_train)\n\n<span class=\"cm\"># sigmoid 교정: 소량 데이터에 적합</span>\ncalibrated = <span class=\"fn\">CalibratedClassifierCV</span>(\n    estimator=mlp,\n    method=<span class=\"st\">'sigmoid'</span>,\n    cv=<span class=\"nm\">5</span>\n)\ncalibrated.<span class=\"fn\">fit</span>(X_val, y_val)  <span class=\"cm\"># 검증 데이터로 교정</span>"
+        },
+        {
+          "type": "tip",
+          "html": "교정 순서: <b>MLP 학습(train) → Calibration(val) → TunedThreshold(val)</b>. 학습 데이터와 교정 데이터를 분리해야 교정 효과가 정확하다."
+        }
+      ]
+    },
+    {
+      "fnName": "TunedThresholdClassifierCV()",
+      "badgeCls": "b-purple",
+      "badgeText": "임계값 최적화",
+      "open": false,
+      "blocks": [
+        {
+          "type": "meaning",
+          "html": "이진분류의 기본 임계값 0.5를 지정 평가지표 기준으로 자동 최적화. Precision-Recall 트레이드오프를 고려해 F1, precision, recall 중 목적에 맞는 지표로 최적 임계값을 탐색한다."
+        },
+        {
+          "type": "slbl",
+          "text": "핵심 파라미터"
+        },
+        {
+          "type": "table",
+          "html": "<table class=\"pt\"><tr><td>estimator</td><td>estimator</td><td>임계값을 최적화할 분류기 (교정 모델 권장)</td></tr><tr><td>scoring</td><td>str='f1'</td><td>최적화 기준: 'f1', 'precision', 'recall'</td></tr><tr><td>cv</td><td>int=5</td><td>교차검증 폴드 수</td></tr><tr><td>n_jobs</td><td>int=1</td><td>병렬 처리 코어 수 (-1=전체)</td></tr></table>"
+        },
+        {
+          "type": "slbl",
+          "text": "코드 예시"
+        },
+        {
+          "type": "pre",
+          "html": "<span class=\"kw\">from</span> sklearn.model_selection <span class=\"kw\">import</span> TunedThresholdClassifierCV\n<span class=\"kw\">from</span> sklearn.metrics <span class=\"kw\">import</span> classification_report\n\ntuned = <span class=\"fn\">TunedThresholdClassifierCV</span>(\n    estimator=calibrated,  <span class=\"cm\"># 교정된 모델 전달</span>\n    scoring=<span class=\"st\">'f1'</span>,\n    cv=<span class=\"nm\">5</span>,\n    n_jobs=-<span class=\"nm\">1</span>\n)\ntuned.<span class=\"fn\">fit</span>(X_val, y_val)\n\n<span class=\"fn\">print</span>(<span class=\"st\">f\"최적 임계값: {tuned.best_threshold_:.4f}\"</span>)\n\ny_pred = tuned.<span class=\"fn\">predict</span>(X_test)\n<span class=\"fn\">print</span>(<span class=\"fn\">classification_report</span>(y_test, y_pred))"
+        },
+        {
+          "type": "warn",
+          "html": "<b>임계값 트레이드오프:</b> 임계값 ↑ → Precision ↑ / Recall ↓. 임계값 ↓ → Recall ↑ / Precision ↓. 의료·금융처럼 FN 비용이 높으면 recall 최적화, 스팸필터처럼 FP 비용이 높으면 precision 최적화."
+        }
+      ]
+    }
+  ]
+}
