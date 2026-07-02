@@ -3,12 +3,15 @@ export interface LibSection {
   label: string;
 }
 
+export type LibCategory = "ml" | "dl";
+
 export interface Library {
   slug: string;
   title: string;
   description: string;
   icon: string;
   color: string;
+  category: LibCategory;
   sections: LibSection[];
 }
 
@@ -19,6 +22,7 @@ export const LIBRARIES: Library[] = [
     description: "배열 생성 · 수학/선형대수 · 난수",
     icon: "⬡",
     color: "#4878D0",
+    category: "ml",
     sections: [
       { id: "import_sec", label: "import & 기초" },
       { id: "create", label: "배열 생성" },
@@ -37,6 +41,7 @@ export const LIBRARIES: Library[] = [
     description: "DataFrame · 필터링 · groupby · 병합 · I/O",
     icon: "⊞",
     color: "#5B8DB8",
+    category: "ml",
     sections: [
       { id: "import_sec", label: "import & 기초" },
       { id: "struct", label: "자료구조" },
@@ -57,6 +62,7 @@ export const LIBRARIES: Library[] = [
     description: "기본 플롯 · 통계 · 레이아웃 · 3D",
     icon: "◈",
     color: "#5C9E6E",
+    category: "ml",
     sections: [
       { id: "import_sec", label: "import & 기초" },
       { id: "figure", label: "Figure & Axes" },
@@ -75,6 +81,7 @@ export const LIBRARIES: Library[] = [
     description: "확률분포 · 가설검정 · 최적화 · FFT",
     icon: "∫",
     color: "#8B6BB1",
+    category: "ml",
     sections: [
       { id: "import_sec", label: "import & 개요" },
       { id: "dist", label: "확률분포" },
@@ -95,6 +102,7 @@ export const LIBRARIES: Library[] = [
     description: "전처리 · 선형/트리 모델 · 평가 · Pipeline",
     icon: "⚙",
     color: "#E07040",
+    category: "ml",
     sections: [
       { id: "import_sec", label: "import & API 구조" },
       { id: "preprocess", label: "전처리" },
@@ -113,6 +121,7 @@ export const LIBRARIES: Library[] = [
     description: "OLS · GLM · ARIMA · 가설검정",
     icon: "~",
     color: "#C0602A",
+    category: "ml",
     sections: [
       { id: "import_sec", label: "import & 개요" },
       { id: "ols", label: "OLS 선형회귀" },
@@ -129,6 +138,7 @@ export const LIBRARIES: Library[] = [
     description: "sklearn API · Native API · 파라미터 · 튜닝",
     icon: "⊕",
     color: "#B8860B",
+    category: "ml",
     sections: [
       { id: "import_sec", label: "import & 개요" },
       { id: "sklearn_api", label: "sklearn API" },
@@ -144,6 +154,7 @@ export const LIBRARIES: Library[] = [
     description: "requests · BeautifulSoup · pymysql · DuckDB · 금융",
     icon: "⊗",
     color: "#4A8FA8",
+    category: "ml",
     sections: [
       { id: "import_sec", label: "Import 패턴" },
       { id: "requests_sec", label: "requests & BS4" },
@@ -159,6 +170,7 @@ export const LIBRARIES: Library[] = [
       "Bayes 원리 · CategoricalNB · BernoulliNB · MultinomialNB · 튜닝",
     icon: "ℙ",
     color: "#2E86AB",
+    category: "ml",
     sections: [
       { id: "nb_intro", label: "Bayes 원리 & 개요" },
       { id: "categorical_nb", label: "CategoricalNB" },
@@ -174,6 +186,7 @@ export const LIBRARIES: Library[] = [
     description: "확률기초 · MLE · 로지스틱 · 임계값 · 평가 · PCA",
     icon: "σ",
     color: "#9B59B6",
+    category: "ml",
     sections: [
       { id: "prob", label: "확률 기초" },
       { id: "likelihood", label: "우도 & MLE" },
@@ -189,6 +202,7 @@ export const LIBRARIES: Library[] = [
     description: "K-최근접 이웃 · 군집화 · 이상치 탐지 · DBSCAN",
     icon: "K",
     color: "#0ea5e9",
+    category: "ml",
     sections: [
       { id: "nearest_neighbors", label: "NearestNeighbors 기초" },
       { id: "knn_classifier", label: "KNN 분류 / 회귀" },
@@ -207,6 +221,7 @@ export const LIBRARIES: Library[] = [
     description: "SVD · PCA · IncrementalPCA · KernelPCA · UMAP · Manifold",
     icon: "⊕",
     color: "#7c3aed",
+    category: "ml",
     sections: [
       { id: "svd", label: "SVD" },
       { id: "pca_core", label: "PCA 핵심" },
@@ -220,6 +235,7 @@ export const LIBRARIES: Library[] = [
     description: "SVC · 커널 함수 · NuSVC · Platt Scaling · 이상탐지",
     icon: "⊕",
     color: "#7c3aed",
+    category: "ml",
     sections: [
       { id: "svc_basics", label: "SVC 기초" },
       { id: "kernel_types", label: "커널 함수" },
@@ -229,34 +245,55 @@ export const LIBRARIES: Library[] = [
       { id: "oneclass_svm", label: "이상탐지" },
     ],
   },
-    {
-    slug: 'text_mining',
-    title: 'Text Mining',
-    description: 'One-Hot · TF-IDF · NLTK · Gensim · Word2Vec · KoNLPy',
-    icon: '言',
-    color: '#7c3aed',
+  {
+    slug: "text_mining",
+    title: "Text Mining",
+    description: "One-Hot · TF-IDF · NLTK · Gensim · Word2Vec · KoNLPy",
+    icon: "言",
+    color: "#7c3aed",
+    category: "ml",
     sections: [
-      { id: 'encoding',        label: 'Encoding & TF-IDF' },
-      { id: 'nltk_basic',      label: 'NLTK 토크나이징' },
-      { id: 'nltk_classify',   label: 'NLTK 분류' },
-      { id: 'gensim_dict',     label: 'Gensim Dictionary' },
-      { id: 'gensim_topic',    label: 'LSI 토픽 모델링' },
-      { id: 'gensim_word2vec', label: 'Word2Vec / FastText' },
-      { id: 'korean_nlp',      label: 'KoNLPy · WordCloud' },
+      { id: "encoding", label: "Encoding & TF-IDF" },
+      { id: "nltk_basic", label: "NLTK 토크나이징" },
+      { id: "nltk_classify", label: "NLTK 분류" },
+      { id: "gensim_dict", label: "Gensim Dictionary" },
+      { id: "gensim_topic", label: "LSI 토픽 모델링" },
+      { id: "gensim_word2vec", label: "Word2Vec / FastText" },
+      { id: "korean_nlp", label: "KoNLPy · WordCloud" },
     ],
   },
   {
-    slug: 'ann',
-    title: 'ANN / MLP',
-    description: 'MLPClassifier · MLPRegressor · 손실함수 · 활성화함수 · 임계값 최적화',
-    icon: '🧠',
-    color: '#7c3aed',
+    slug: "ann",
+    title: "ANN / MLP",
+    description:
+      "MLPClassifier · MLPRegressor · 손실함수 · 활성화함수 · 임계값 최적화",
+    icon: "🧠",
+    color: "#7c3aed",
+    category: "ml",
     sections: [
-      { id: 'mlp_basic',            label: 'MLP 기본 구조' },
-      { id: 'loss_functions',       label: '손실함수' },
-      { id: 'activation_functions', label: '활성화함수' },
-      { id: 'training_tuning',      label: '학습 튜닝' },
-      { id: 'threshold_calibration',label: '임계값 최적화' },
+      { id: "mlp_basic", label: "MLP 기본 구조" },
+      { id: "loss_functions", label: "손실함수" },
+      { id: "activation_functions", label: "활성화함수" },
+      { id: "training_tuning", label: "학습 튜닝" },
+      { id: "threshold_calibration", label: "임계값 최적화" },
+    ],
+  },
+  {
+    slug: "tensorflow_ffnn",
+    title: "TensorFlow / FFNN",
+    description:
+      "텐서 기초 · 선형대수 · GradientTape · Dense/Sequential · 커스텀 모델 · MNIST 학습",
+    icon: "⚡",
+    color: "#f97316",
+    category: "dl",
+    sections: [
+      { id: "tensor_basics", label: "텐서 기초" },
+      { id: "linear_algebra", label: "선형대수" },
+      { id: "tensor_shape_ops", label: "텐서 변형" },
+      { id: "dense_bias", label: "Dense / Bias" },
+      { id: "autodiff_training", label: "자동미분 · 학습루프" },
+      { id: "keras_sequential_mode", label: "Sequential · 그래프모드" },
+      { id: "loss_and_custom_model", label: "손실함수 · 커스텀 모델" },
     ],
   },
 ];
@@ -264,3 +301,8 @@ export const LIBRARIES: Library[] = [
 export function getLibrary(slug: string): Library | undefined {
   return LIBRARIES.find((l) => l.slug === slug);
 }
+
+export const CATEGORY_LABELS: Record<LibCategory, string> = {
+  ml: "머신러닝",
+  dl: "딥러닝",
+};
