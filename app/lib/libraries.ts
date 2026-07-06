@@ -296,6 +296,38 @@ export const LIBRARIES: Library[] = [
       { id: "loss_and_custom_model", label: "손실함수 · 커스텀 모델" },
     ],
   },
+  {
+    slug: "cnn",
+    title: "CNN / Grad-CAM",
+    description:
+      "Conv2D · MaxPooling · Grad-CAM 시각화 · 데이터 증강 · tf.data",
+    icon: "▦",
+    color: "#f97316",
+    category: "dl",
+    sections: [
+      { id: "conv_basics", label: "Conv2D / Pooling 기초" },
+      { id: "train_eval", label: "모델 학습 & 평가" },
+      { id: "gradcam", label: "Grad-CAM 시각화" },
+      { id: "augmentation", label: "데이터 증강" },
+      { id: "tf_data_tfds", label: "tf.data & TFDS" },
+    ],
+  },
+  {
+    slug: "transfer_learning",
+    title: "Transfer Learning",
+    description:
+      "전이학습 전략 · Xception · EfficientNet · 커스텀 파이프라인 · 튜닝",
+    icon: "⇄",
+    color: "#f97316",
+    category: "dl",
+    sections: [
+      { id: "tl_concept", label: "전이학습 개념 & 전략" },
+      { id: "feature_extraction", label: "Feature Extraction (Xception)" },
+      { id: "efficientnet", label: "EfficientNet 계열" },
+      { id: "custom_pipeline", label: "커스텀 이미지 파이프라인" },
+      { id: "hp_tuning", label: "하이퍼파라미터 튜닝" },
+    ],
+  },
 ];
 
 export function getLibrary(slug: string): Library | undefined {
